@@ -21,7 +21,7 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       {/* Top bar with contact info */}
       <div className="hidden md:block bg-brand/5 border-b border-brand/10">
-        <div className="px-6 md:px-12 lg:px-20 xl:px-24 2xl:px-32 mx-auto w-full mx-auto px-4 py-2">
+        <div className="px-6 md:px-12 lg:px-20 xl:px-24 2xl:px-32 mx-auto w-full py-2">
           <div className="flex justify-between items-center max-[860px]:text-[0.7rem] text-sm text-muted-foreground">
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2">
