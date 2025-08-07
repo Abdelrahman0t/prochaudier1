@@ -1,0 +1,253 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 215 20% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 20% 15%;
+
+    --primary: 200 100% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 200 100% 85%;
+    --primary-dark: 200 100% 35%;
+
+    --secondary: 210 50% 98%;
+    --secondary-foreground: 215 20% 25%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 15% 50%;
+
+    --accent: 200 100% 96%;
+    --accent-foreground: 200 100% 30%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 20% 90%;
+    --input: 210 20% 95%;
+    --ring: 200 100% 45%;
+
+    --success: 120 60% 50%;
+    --warning: 38 92% 50%;
+    --info: 200 100% 50%;
+
+    /* Pro Chaudiere specific tokens */
+    --brand-blue: 200 100% 45%;
+    --brand-blue-light: 200 100% 85%;
+    --brand-blue-dark: 200 100% 35%;
+    --brand-gray: 215 15% 50%;
+    --brand-gray-light: 210 20% 95%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-dark)) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary-light)) 0%, hsl(var(--primary)) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(var(--primary) / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(var(--primary) / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(var(--primary) / 0.1);
+    --shadow-xl: 0 20px 25px -5px hsl(var(--primary) / 0.1);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 215 25% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 215 25% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 215 25% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 200 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 200 100% 75%;
+    --primary-dark: 200 100% 45%;
+
+    --secondary: 215 25% 15%;
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 215 25% 15%;
+    --muted-foreground: 215 15% 60%;
+
+    --accent: 200 100% 20%;
+    --accent-foreground: 200 100% 80%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 25% 20%;
+    --input: 215 25% 15%;
+    --ring: 200 100% 55%;
+
+    --success: 120 60% 60%;
+    --warning: 38 92% 60%;
+    --info: 200 100% 60%;
+
+    /* Dark mode specific overrides */
+    --brand-blue: 200 100% 55%;
+    --brand-blue-light: 200 100% 75%;
+    --brand-blue-dark: 200 100% 45%;
+    --brand-gray: 215 15% 60%;
+    --brand-gray-light: 215 25% 20%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-dark)) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary-light)) 0%, hsl(var(--primary)) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
+
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.1);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.2);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.3);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.4);
+    
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: Inter, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: hsl(var(--secondary));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground));
+    border-radius: 0.375rem;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary));
+  }
+
+  /* Alternative scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: #d4d4d8;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  /* Brand-specific utility classes */
+  .brand-gradient {
+    background: var(--gradient-primary);
+  }
+
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+
+  .subtle-gradient {
+    background: var(--gradient-subtle);
+  }
+
+  .shadow-brand {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    transition: var(--transition-smooth);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .hover-scale {
+    transition: var(--transition-smooth);
+  }
+  
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  /* Typography */
+  .text-brand {
+    color: hsl(var(--brand-blue));
+  }
+
+  .text-brand-light {
+    color: hsl(var(--brand-blue-light));
+  }
+
+  .text-brand-dark {
+    color: hsl(var(--brand-blue-dark));
+  }
+
+  /* Backgrounds */
+  .bg-brand {
+    background-color: hsl(var(--brand-blue));
+  }
+
+  .bg-brand-light {
+    background-color: hsl(var(--brand-blue-light));
+  }
+
+  .bg-brand-dark {
+    background-color: hsl(var(--brand-blue-dark));
+  }
+}
