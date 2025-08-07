@@ -10,11 +10,11 @@ import Footer from "../components/Footer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <div className="min-h-screen bg-background ">
       <Header />
       <main>
         <Hero />
-        <Categories /> 
+        <Categories />
         <FeaturedProducts />
         <WhyChooseUs />
         <Testimonials />
