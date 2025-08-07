@@ -281,7 +281,12 @@ const handlePriceChange = (newRange) => {
 
 
 
-const handleAddToCart = (product: any) => {
+// Improved handleAddToCart function with mobile optimizations
+const handleAddToCart = async (product) => {
+  // Prevent multiple rapid taps (common on mobile)
+  if (isAddingToCart) return;
+  setIsAddingToCart(true);
+
   try {
     if (!product || !product.id) throw new Error("Invalid product");
 
@@ -289,26 +294,41 @@ const handleAddToCart = (product: any) => {
       ? `${import.meta.env.VITE_API_BASE_URL}${product.image}`
       : "/placeholder.svg";
 
-    addToCart({
-      id: product.id,
-      name: product.title || "Produit",
-      price: Number(product.price) || 0, // ✅ ensure number
-      image: imageUrl,
-      quantity: 1
+    // Use requestAnimationFrame to ensure smooth UI updates
+    requestAnimationFrame(() => {
+      addToCart({
+        id: product.id,
+        name: product.title || "Produit",
+        price: Number(product.price) || 0,
+        image: imageUrl,
+        quantity: 1
+      });
+
+      // Delay toast to prevent layout conflicts
+      setTimeout(() => {
+        toast({
+          title: "Produit ajouté au panier",
+          description: `${product.title || "Produit"} ajouté au panier.`,
+          duration: 2000, // Shorter duration on mobile
+        });
+      }, 100);
     });
 
-    toast({
-      title: "Produit ajouté au panier",
-      description: `${product.title || "Produit"} ajouté au panier.`,
-    });
   } catch (error) {
     console.error("🛑 Failed to add to cart:", error);
     toast({
       title: "Erreur",
       description: "Impossible d'ajouter le produit au panier.",
+      variant: "destructive",
     });
+  } finally {
+    // Reset the flag after a short delay
+    setTimeout(() => setIsAddingToCart(false), 500);
   }
 };
+
+// Add this state at the top of your component
+const [isAddingToCart, setIsAddingToCart] = useState(false);
 
 
 
