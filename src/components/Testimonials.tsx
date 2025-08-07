@@ -102,27 +102,31 @@ const Testimonials = () => {
         </div>
 
         {/* Trust indicators */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-2xl px-8 py-6 shadow-lg">
-            <div className="flex items-center space-x-8">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-brand">4.8/5</div>
-                <div className="text-sm text-muted-foreground">Note moyenne</div>
-              </div>
-              <div className="w-px h-12 bg-border"></div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-brand">500+</div>
-                <div className="text-sm text-muted-foreground">Avis clients</div>
-              </div>
-              <div className="w-px h-12 bg-border"></div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-brand">98%</div>
-                <div className="text-sm text-muted-foreground">Recommandent</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+<div className="mt-16 text-center px-4">
+  <div className="flex flex-col sm:flex-row items-center justify-center bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-6 shadow-lg space-y-4 sm:space-y-0 sm:space-x-8">
+    
+    <div className="w-full sm:w-auto my-2 text-center">
+      <div className="text-2xl font-bold text-brand">4.8/5</div>
+      <div className="text-sm text-muted-foreground">Note moyenne</div>
+    </div>
+
+    {/* Divider */}
+    <div className="hidden sm:block w-px h-12 bg-border"></div>
+
+    <div className="w-full sm:w-auto my-2 text-center">
+      <div className="text-2xl font-bold text-brand">500+</div>
+      <div className="text-sm text-muted-foreground">Avis clients</div>
+    </div>
+
+    {/* Divider */}
+    <div className="hidden  sm:block  w-px h-12 bg-border"></div>
+
+    <div className="w-full  sm:w-auto my-2 text-center ">
+      <div className="text-2xl font-bold text-brand">98%</div>
+      <div className="text-sm text-muted-foreground">Recommandent</div>
+    </div>
+  </div>
+</div>
     </section>
   );
 };
