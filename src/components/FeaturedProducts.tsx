@@ -6,80 +6,89 @@ import { useNavigate } from 'react-router-dom';
 
 const FeaturedProducts = () => {
   const navigate = useNavigate();
-const brands = [
-  {
-    id: 1,
-    name: "Vaillant",
-    description: "Chaudières et systèmes de chauffage Vaillant, technologie allemande reconnue.",
-    image: "/7-1.png",
-    rating: 4.8,
-    reviews: 120,
-    badge: "Top ventes",
-  },
-  {
-    id: 2,
-    name: "Facofri",
-    description: "Modules et composants hydrauliques Facofri pour performance optimale.",
-    image: "/Design-sans-titre-8.png",
-    rating: 4.6,
-    reviews: 98,
-    badge: "Nouveau",
-  },
-  {
-    id: 3,
-    name: "Beretta",
-    description: "Chaudières italiennes Beretta, fiabilité et efficacité énergétique.",
-    image: "/9.png",
-    rating: 4.9,
-    reviews: 142,
-    badge: "Circulateur star",
-  },
-  {
-    id: 4,
-    name: "Baxi",
-    description: "Solutions de chauffage Baxi, innovation britannique pour votre confort.",
-    image: "/6-1.png",
-    rating: 4.7,
-    reviews: 88,
-    badge: "Top ventes",
-  },
-  {
-    id: 5,
-    name: "Ferroli",
-    description: "Chaudières et systèmes Ferroli, expertise italienne depuis 1955.",
-    image: "/3-1.png",
-    rating: 4.5,
-    reviews: 76,
-    badge: "Circulateur star",
-  },
-  {
-    id: 6,
-    name: "Riello",
-    description: "Brûleurs et chaudières Riello, technologie de pointe italienne.",
-    image: "5-1.png",
-    rating: 4.8,
-    reviews: 115,
-    badge: "Garantie 2 ans",
-  },
-  {
-    id: 7,
-    name: "Ariston",
-    description: "Systèmes de chauffage Ariston, confort et économie d'énergie.",
-    image: "/2-1.png",
-    rating: 4.6,
-    reviews: 101,
-    badge: "Nouveau",
-  },
-  {
-    id: 8,
-    name: "Chaffoteaux",
-    description: "Chaudières Chaffoteaux, tradition française et innovation moderne.",
-    image: "/4-1.png",
-    rating: 4.4,
-    reviews: 66,
-    badge: "Nouveau",
-  },
-];
+  
+  const brands = [
+    {
+      id: 1,
+      name: "Vaillant",
+      slug: "vaillant",
+      description: "Chaudières et systèmes de chauffage Vaillant, technologie allemande reconnue.",
+      image: "/7-1.png",
+      rating: 4.8,
+      reviews: 120,
+      badge: "Top ventes",
+    },
+    {
+      id: 2,
+      name: "Facofri",
+      slug: "facofri", 
+      description: "Modules et composants hydrauliques Facofri pour performance optimale.",
+      image: "/Design-sans-titre-8.png",
+      rating: 4.6,
+      reviews: 98,
+      badge: "Nouveau",
+    },
+    {
+      id: 3,
+      name: "Beretta",
+      slug: "beretta",
+      description: "Chaudières italiennes Beretta, fiabilité et efficacité énergétique.",
+      image: "/9.png",
+      rating: 4.9,
+      reviews: 142,
+      badge: "Circulateur star",
+    },
+    {
+      id: 4,
+      name: "Baxi",
+      slug: "baxi",
+      description: "Solutions de chauffage Baxi, innovation britannique pour votre confort.",
+      image: "/6-1.png",
+      rating: 4.7,
+      reviews: 88,
+      badge: "Top ventes",
+    },
+    {
+      id: 5,
+      name: "Ferroli",
+      slug: "ferroli",
+      description: "Chaudières et systèmes Ferroli, expertise italienne depuis 1955.",
+      image: "/3-1.png",
+      rating: 4.5,
+      reviews: 76,
+      badge: "Circulateur star",
+    },
+    {
+      id: 6,
+      name: "Riello",
+      slug: "riello",
+      description: "Brûleurs et chaudières Riello, technologie de pointe italienne.",
+      image: "5-1.png",
+      rating: 4.8,
+      reviews: 115,
+      badge: "Garantie 2 ans",
+    },
+    {
+      id: 7,
+      name: "Ariston",
+      slug: "ariston",
+      description: "Systèmes de chauffage Ariston, confort et économie d'énergie.",
+      image: "/2-1.png",
+      rating: 4.6,
+      reviews: 101,
+      badge: "Nouveau",
+    },
+    {
+      id: 8,
+      name: "Chaffoteaux",
+      slug: "chaffoteaux",
+      description: "Chaudières Chaffoteaux, tradition française et innovation moderne.",
+      image: "/4-1.png",
+      rating: 4.4,
+      reviews: 66,
+      badge: "Nouveau",
+    },
+  ];
 
   return (
     <section id="products" className="py-20 bg-background">
@@ -99,6 +108,7 @@ const brands = [
               key={brand.id}
               className="group cursor-pointer border-0 shadow-md hover:shadow-xl transition-all duration-300 hover-lift overflow-hidden"
               style={{ animationDelay: `${index * 0.1}s` }}
+              onClick={() => navigate(`/products?brand=${brand.slug}`)}
             >
               <div className="relative overflow-hidden p-4">
                 <img
@@ -108,26 +118,22 @@ const brands = [
                 />
                 
                 {/* Badge */}
-{/* Badge */}
-{brand.badge && (
-  <div className="absolute top-3 left-3">
-<Badge
-  className={
-    (brand.badge.toLowerCase().includes("nouveau")
-      ? "bg-green-500"
-      : brand.badge.toLowerCase().includes("circulateur")
-      ? "bg-yellow-500"
-      : "bg-blue-500") +
-    " text-white pointer-events-none group-hover:scale-100 group-hover:shadow-none transition-none"
-  }
->
-  {brand.badge}
-</Badge>
-
-  </div>
-)}
-
-
+                {brand.badge && (
+                  <div className="absolute top-3 left-3">
+                    <Badge
+                      className={
+                        (brand.badge.toLowerCase().includes("nouveau")
+                          ? "bg-green-500"
+                          : brand.badge.toLowerCase().includes("circulateur")
+                          ? "bg-yellow-500"
+                          : "bg-blue-500") +
+                        " text-white pointer-events-none group-hover:scale-100 group-hover:shadow-none transition-none"
+                      }
+                    >
+                      {brand.badge}
+                    </Badge>
+                  </div>
+                )}
                 
                 {/* Quick view */}
                 <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -135,7 +141,10 @@ const brands = [
                     size="sm" 
                     variant="secondary" 
                     className="h-8 w-8 p-0"
-                    onClick={() => navigate(`/products?brand=${brand.name.toLowerCase()}`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/products?brand=${brand.slug}`);
+                    }}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
@@ -169,7 +178,14 @@ const brands = [
                   </span>
                 </div>
 
-                <Button className="w-full" variant="outline">
+                <Button 
+                  className="w-full border-2 border-blue-100"  
+                  variant="outline" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/products?brand=${brand.slug}`);
+                  }}
+                >
                   Voir les produits
                 </Button>
               </CardContent>
@@ -181,7 +197,7 @@ const brands = [
           <Button 
             variant="outline" 
             size="lg" 
-            className="bg-cyan-600 text-white hover:bg-cyan-700 shadow-lg text-lg px-8 py-6"
+            className="bg-cyan-600 text-white hover:bg-cyan-700 hover:text-white shadow-lg text-lg px-8 py-6"
             onClick={() => navigate('/products')}
           >
             Voir toutes les marques

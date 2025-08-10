@@ -5,6 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
+import ContactUs from "./pages/ContactUs";
+import APropos from "./pages/propos";
+import Journal from "./pages/Journal";
+
+
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
 import CartSidebar from "./components/CartSidebar";
@@ -21,6 +26,10 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/contactus" element={<ContactUs />} />
+          <Route path="/Journal" element={<Journal />} />
+          <Route path="/Apropos" element={<APropos />} />
+
           <Route path="/product/:id" element={<ProductDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

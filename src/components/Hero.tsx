@@ -2,7 +2,7 @@
 import { ArrowRight, Shield, Truck, Clock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import heroImage from "@/assets/hero-boiler.jpg";
+import heroImage from "@/assets/leo_boiler2.jpg";
 
 const Hero = () => {
   const navigate = useNavigate();

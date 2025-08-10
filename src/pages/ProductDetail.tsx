@@ -23,6 +23,11 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Scroll to top when component mounts or product ID changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [id]);
+
   // Fetch product details from API
   useEffect(() => {
     const fetchProduct = async () => {
@@ -145,25 +150,25 @@ const ProductDetail = () => {
       
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/products')}
-            className="p-0 h-auto"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Retour aux produits
-          </Button>
-          <span>/</span>
-          {product.categories && product.categories.length > 0 && (
-            <>
-              <span>{product.categories[0]}</span>
-              <span>/</span>
-            </>
-          )}
-          <span className="text-foreground">{product.title}</span>
-        </div>
+<div className="flex items-center gap-2 text-xs sm:text-sm md:text-base text-muted-foreground mb-6">
+  <Button 
+    variant="ghost" 
+    size="sm" 
+    onClick={() => navigate('/products')}
+    className="p-0 h-auto text-xs sm:text-sm md:text-base"
+  >
+    <ArrowLeft className="h-4 w-4 mr-1" />
+    Retour aux produits
+  </Button>
+  <span>/</span>
+  {product.categories && product.categories.length > 0 && (
+    <>
+      <span>{product.categories[0]}</span>
+      <span>/</span>
+    </>
+  )}
+  <span className="text-foreground">{product.title}</span>
+</div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images */}
@@ -211,7 +216,7 @@ const ProductDetail = () => {
                   {product.categories[0]}
                 </Badge>
               )}
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2">
                 {product.title}
               </h1>
               <div className="flex items-center gap-4 mb-4">

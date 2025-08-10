@@ -1,10 +1,14 @@
 import { Wrench, Zap, Droplets, Gauge, Filter, Settings, Flame, Shield } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from 'react-router-dom';
 
 const Categories = () => {
+  const navigate = useNavigate();
+  
   const categories = [
     {
-      name: "Cartes électroniques",
+      name: "Carte électronique",
+      slug: "carte-electronique", // Matches your actual category
       count: "17 produits",
       icon: Zap,
       color: "text-blue-600",
@@ -12,13 +16,15 @@ const Categories = () => {
     },
     {
       name: "Modules Hydrauliques",
+      slug: "modules-hydrauliques", // Matches your actual category
       count: "24 produits", 
       icon: Droplets,
       color: "text-cyan-600",
       bgColor: "bg-cyan-50",
     },
     {
-      name: "Pompes",
+      name: "Pompe",
+      slug: "pompe", // Matches your actual category
       count: "19 produits",
       icon: Settings,
       color: "text-green-600",
@@ -26,40 +32,50 @@ const Categories = () => {
     },
     {
       name: "Vannes 3 voies",
+      slug: "vannes-3-voies", // Matches your actual category
       count: "16 produits",
       icon: Wrench,
       color: "text-orange-600",
       bgColor: "bg-orange-50",
     },
     {
-      name: "Capteurs",
+      name: "Capteur",
+      slug: "capteur", // Matches your actual category
       count: "11 produits",
       icon: Gauge,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
     },
     {
-      name: "Échangeurs",
-      count: "9 produits",
+      name: "ÉCHANGEURS",
+      slug: "echangeurs", // Matches your actual category
+      count: "15 produits", // Combined count from ÉCHANGEURS(6) + ECHANGEURS SECONDAIRES(9)
       icon: Filter,
       color: "text-red-600",
       bgColor: "bg-red-50",
     },
     {
-      name: "Ventilateurs",
+      name: "Ventilateurs chaudière",
+      slug: "ventilateurs-chaudiere", // Matches your actual category
       count: "7 produits",
       icon: Flame,
       color: "text-indigo-600",
       bgColor: "bg-indigo-50",
     },
     {
-      name: "Soupapes",
+      name: "Soupape chaudière",
+      slug: "soupape-chaudiere", // Matches your actual category
       count: "6 produits",
       icon: Shield,
       color: "text-pink-600",
       bgColor: "bg-pink-50",
     },
   ];
+
+  const handleCategoryClick = (category) => {
+    // Navigate to products page with category parameter
+    navigate(`/products?category=${category.slug}`);
+  };
 
   return (
     <section id="categories" className="py-20 bg-gradient-subtle">
@@ -82,6 +98,7 @@ const Categories = () => {
                 key={category.name}
                 className="group cursor-pointer border-0 shadow-md hover:shadow-xl transition-all duration-300 hover-lift bg-white/80 backdrop-blur-sm"
                 style={{ animationDelay: `${index * 0.1}s` }}
+                onClick={() => handleCategoryClick(category)}
               >
                 <CardContent className="p-6 text-center">
                   <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${category.bgColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>
@@ -102,7 +119,10 @@ const Categories = () => {
         </div>
 
         <div className="text-center mt-12">
-          <button className="inline-flex items-center text-brand font-semibold hover:text-brand-dark transition-colors">
+          <button 
+            className="inline-flex items-center text-brand font-semibold hover:text-brand-dark transition-colors"
+            onClick={() => navigate('/products')}
+          >
             Voir toutes les catégories
             <Wrench className="ml-2 h-4 w-4" />
           </button>

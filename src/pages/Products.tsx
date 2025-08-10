@@ -1,4 +1,3 @@
-
 import { useState, useEffect , useMemo } from 'react';
 import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/hooks/use-toast";
@@ -9,18 +8,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import * as SliderPrimitive from "@radix-ui/react-slider";
-
-// Mock product data
-
-
-
-
 
 const FilterSidebar = ({
   searchQuery,
@@ -34,11 +26,11 @@ const FilterSidebar = ({
   priceRange,
   handlePriceChange,
   clearFilters,
-    openParents,
+  openParents,
   setOpenParents,
 }) => {
 
-   const toggleParent = (slug) => {
+  const toggleParent = (slug) => {
     setOpenParents((prev) => ({
       ...prev,
       [slug]: !prev[slug],
@@ -64,7 +56,7 @@ const FilterSidebar = ({
         <h3 className="font-semibold text-foreground mb-3">Catégories</h3>
         <div className="space-y-3">
           {categories.map((parent) => (
-            <div key={parent.id}>
+            <div key={parent.id} id={`category-${parent.slug}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -93,7 +85,7 @@ const FilterSidebar = ({
               {parent.children && parent.children.length > 0 && openParents[parent.slug] && (
                 <div className="ml-6 mt-2 space-y-2">
                   {parent.children.map((child) => (
-                    <div key={child.id} className="flex items-center space-x-2">
+                    <div key={child.id} className="flex items-center space-x-2" id={`category-${child.slug}`}>
                       <Checkbox
                         id={child.slug}
                         checked={selectedCategories.includes(child.slug)}
@@ -122,13 +114,13 @@ const FilterSidebar = ({
           {tags.map((tag) => (
             <Badge
               key={tag.slug}
-              variant={selectedTags.includes(tag.slug) ? "default" : "outline"}
+              variant={selectedTags.includes(tag.name) ? "default" : "outline"}
               className={`cursor-pointer text-xs ${
-                selectedTags.includes(tag.slug)
+                selectedTags.includes(tag.name)
                   ? "bg-brand text-white"
                   : "text-muted-foreground border-muted"
               }`}
-              onClick={() => handleTagToggle(tag.slug)}
+              onClick={() => handleTagToggle(tag.name)}
             >
               {tag.name}
             </Badge>
@@ -170,179 +162,395 @@ const FilterSidebar = ({
         Effacer les filtres
       </Button>
     </div>
-  );}
-
-
+  );
+};
 
 const Products = () => {
   const { addToCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState([0, 175000]);
-const [priceChanged, setPriceChanged] = useState(false);
+  const [priceChanged, setPriceChanged] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   const [products, setProducts] = useState([]);
-const [categories, setCategories] = useState([]);
-const [tags, setTags] = useState([]);
-const [selectedTags, setSelectedTags] = useState<string[]>([]);
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
-const [openParents, setOpenParents] = useState<Record<string, boolean>>({});
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+  const [openParents, setOpenParents] = useState<Record<string, boolean>>({});
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [urlParamsProcessed, setUrlParamsProcessed] = useState(false);
 
-
+  // Handle brand and category parameters from URL - FIXED VERSION
+  useEffect(() => {
+    const brandParam = searchParams.get('brand');
+    const categoryParam = searchParams.get('category');
+    
+    // Create a unique key for current URL params
+    const currentUrlKey = `${brandParam || ''}-${categoryParam || ''}`;
+    const previousUrlKey = `${selectedTags.length > 0 && selectedTags[0] ? selectedTags[0].toLowerCase() : ''}-${selectedCategories.length > 0 ? selectedCategories[0] : ''}`;
+    
+    // Only process if URL params exist and are different from current state
+    if ((brandParam || categoryParam) && currentUrlKey !== previousUrlKey && !urlParamsProcessed) {
+      setSelectedTags([]);
+      setSelectedCategories([]);
+      setCurrentPage(1);
+      setUrlParamsProcessed(true);
+      
+      if (brandParam) {
+        // Convert brand slug to tag name (capitalize first letter)
+        const brandTagName = brandParam.charAt(0).toUpperCase() + brandParam.slice(1).toLowerCase();
+        setSelectedTags([brandTagName]);
+      }
+      
+      if (categoryParam) {
+        setSelectedCategories([categoryParam]);
+        
+        // Wait for categories to be loaded if they're not yet
+        if (categories.length > 0) {
+          // Find the parent category and expand it
+          const findParentAndExpand = () => {
+            let parentSlug = null;
+            
+            // Check if it's a direct parent category
+            const directParent = categories.find(cat => cat.slug === categoryParam);
+            if (directParent) {
+              parentSlug = categoryParam;
+            } else {
+              // Check if it's a child category
+              const parentWithChild = categories.find(cat => 
+                cat.children && cat.children.some(child => child.slug === categoryParam)
+              );
+              if (parentWithChild) {
+                parentSlug = parentWithChild.slug;
+              }
+            }
+            
+            if (parentSlug) {
+              setOpenParents(prev => ({
+                ...prev,
+                [parentSlug]: true
+              }));
+              
+              // Scroll to the category within the sidebar
+              setTimeout(() => {
+                const categoryElement = document.getElementById(`category-${categoryParam}`);
+                const sidebarContainer = document.querySelector('aside.overflow-y-auto');
+                
+                if (categoryElement && sidebarContainer) {
+                  const categoryTop = categoryElement.offsetTop;
+                  const sidebarHeight = sidebarContainer.clientHeight;
+                  const categoryHeight = categoryElement.offsetHeight;
+                  
+                  // Calculate scroll position to center the category in the sidebar
+                  const scrollPosition = categoryTop - (sidebarHeight / 2) + (categoryHeight / 2);
+                  
+                  sidebarContainer.scrollTo({
+                    top: Math.max(0, scrollPosition),
+                    behavior: 'smooth'
+                  });
+                }
+              }, 300);
+            }
+          };
+          
+          findParentAndExpand();
+        }
+      }
+    } else if (!brandParam && !categoryParam && urlParamsProcessed) {
+      // Reset when no URL params are present
+      setUrlParamsProcessed(false);
+    }
+  }, [searchParams, categories]);
+  
+  // Separate effect to handle category selection when categories load
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam && categories.length > 0 && selectedCategories.length === 0 && !urlParamsProcessed) {
+      setSelectedCategories([categoryParam]);
+      setUrlParamsProcessed(true);
+      
+      // Handle parent expansion and scrolling
+      const handleCategoryDisplay = () => {
+        let parentSlug = null;
+        
+        // Check if it's a direct parent category
+        const directParent = categories.find(cat => cat.slug === categoryParam);
+        if (directParent) {
+          parentSlug = categoryParam;
+        } else {
+          // Check if it's a child category
+          const parentWithChild = categories.find(cat => 
+            cat.children && cat.children.some(child => child.slug === categoryParam)
+          );
+          if (parentWithChild) {
+            parentSlug = parentWithChild.slug;
+          }
+        }
+        
+        if (parentSlug) {
+          setOpenParents(prev => ({ ...prev, [parentSlug]: true }));
+          
+          // Scroll to the category within the sidebar
+          setTimeout(() => {
+            const categoryElement = document.getElementById(`category-${categoryParam}`);
+            const sidebarContainer = document.querySelector('aside.overflow-y-auto');
+            
+            if (categoryElement && sidebarContainer) {
+              const categoryTop = categoryElement.offsetTop;
+              const sidebarHeight = sidebarContainer.clientHeight;
+              const categoryHeight = categoryElement.offsetHeight;
+              
+              // Calculate scroll position to center the category in the sidebar
+              const scrollPosition = categoryTop - (sidebarHeight / 2) + (categoryHeight / 2);
+              
+              sidebarContainer.scrollTo({
+                top: Math.max(0, scrollPosition),
+                behavior: 'smooth'
+              });
+            }
+          }, 300);
+        }
+      };
+      
+      handleCategoryDisplay();
+    }
+    
+    // Also handle the case where category is already selected but we need to expand/scroll
+    if (categoryParam && categories.length > 0 && selectedCategories.includes(categoryParam)) {
+      const handleCategoryDisplay = () => {
+        let parentSlug = null;
+        
+        // Check if it's a direct parent category
+        const directParent = categories.find(cat => cat.slug === categoryParam);
+        if (directParent) {
+          parentSlug = categoryParam;
+        } else {
+          // Check if it's a child category
+          const parentWithChild = categories.find(cat => 
+            cat.children && cat.children.some(child => child.slug === categoryParam)
+          );
+          if (parentWithChild) {
+            parentSlug = parentWithChild.slug;
+          }
+        }
+        
+        if (parentSlug && !openParents[parentSlug]) {
+          setOpenParents(prev => ({ ...prev, [parentSlug]: true }));
+          
+          // Scroll to the category within the sidebar
+          setTimeout(() => {
+            const categoryElement = document.getElementById(`category-${categoryParam}`);
+            const sidebarContainer = document.querySelector('aside.overflow-y-auto');
+            
+            if (categoryElement && sidebarContainer) {
+              const categoryTop = categoryElement.offsetTop;
+              const sidebarHeight = sidebarContainer.clientHeight;
+              const categoryHeight = categoryElement.offsetHeight;
+              
+              // Calculate scroll position to center the category in the sidebar
+              const scrollPosition = categoryTop - (sidebarHeight / 2) + (categoryHeight / 2);
+              
+              sidebarContainer.scrollTo({
+                top: Math.max(0, scrollPosition),
+                behavior: 'smooth'
+              });
+            }
+          }, 500); // Slightly longer delay to ensure parent is expanded
+        }
+      };
+      
+      handleCategoryDisplay();
+    }
+  }, [categories, searchParams, selectedCategories, openParents]);
 
   useEffect(() => {
-  const fetchFilters = async () => {
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/categories-tags/`);
-      const data = await res.json();
-      setCategories(data.categories);
-      setTags(data.tags);
-    } catch (err) {
-      console.error('❌ Error fetching filters', err);
+    const fetchFilters = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/categories-tags/`);
+        const data = await res.json();
+        setCategories(data.categories);
+        setTags(data.tags);
+      } catch (err) {
+        console.error('❌ Error fetching filters', err);
+      }
+    };
+
+    const fetchProducts = async () => {
+      try {
+        const query = new URLSearchParams();
+        query.append("page", currentPage.toString());
+
+        if (debouncedSearch) query.append("search", debouncedSearch);
+        if (selectedCategories.length > 0) query.append("categories", selectedCategories.join(","));
+        if (selectedTags.length > 0) query.append("tags", selectedTags.join(","));
+        if (priceChanged && priceRange.length === 2) {
+          query.append("min_price", priceRange[0].toString());
+          query.append("max_price", priceRange[1].toString());
+        }
+
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products/?${query}`);
+        const data = await res.json();
+        setProducts(data.products);
+        setTotalPages(data.total_pages || 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error("❌ Error fetching products", err);
+      }
+    };
+
+    fetchFilters();
+    fetchProducts();
+  }, [debouncedSearch, selectedCategories, priceRange, currentPage, selectedTags]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  // FIXED handleCategoryChange function
+  const handleCategoryChange = (category: string, checked: boolean) => {
+    setCurrentPage(1);
+
+    setSelectedCategories(prev => {
+      let newCategories;
+      if (checked) {
+        newCategories = [...prev, category];
+        const parent = categories.find(cat => cat.slug === category && cat.children?.length > 0);
+        if (parent) {
+          setOpenParents(prevOpen => ({ ...prevOpen, [category]: true }));
+        }
+      } else {
+        newCategories = prev.filter(c => c !== category);
+      }
+      
+      // Clear URL parameters when manually changing filters
+      if (searchParams.get('brand') || searchParams.get('category')) {
+        navigate('/products', { replace: true });
+        setUrlParamsProcessed(false);
+      }
+      
+      return newCategories;
+    });
+  };
+
+  // FIXED handleTagToggle function
+  const handleTagToggle = (tag: string) => {
+    setCurrentPage(1);
+    setSelectedTags(prev => {
+      const newTags = prev.includes(tag) 
+        ? prev.filter(t => t !== tag) 
+        : [...prev, tag];
+      
+      // Clear URL parameters when manually changing filters
+      if (searchParams.get('brand') || searchParams.get('category')) {
+        navigate('/products', { replace: true });
+        setUrlParamsProcessed(false);
+      }
+      
+      return newTags;
+    });
+  };
+
+  const handlePriceChange = (newRange) => {
+    setPriceRange(newRange);
+    setPriceChanged(true);
+    
+    // Clear URL parameters when manually changing filters
+    if (searchParams.get('brand') || searchParams.get('category')) {
+      navigate('/products', { replace: true });
+      setUrlParamsProcessed(false);
     }
   };
 
-const fetchProducts = async () => {
-  try {
-    const query = new URLSearchParams();
-    query.append("page", currentPage.toString());
+  const handleAddToCart = async (product) => {
+    if (isAddingToCart) return;
+    setIsAddingToCart(true);
 
-    if (debouncedSearch) query.append("search", debouncedSearch);
-    if (selectedCategories.length > 0) query.append("categories", selectedCategories.join(","));
-    if (selectedTags.length > 0) query.append("tags", selectedTags.join(","));
-if (priceChanged && priceRange.length === 2) {
-  query.append("min_price", priceRange[0].toString());
-  query.append("max_price", priceRange[1].toString());
-}
+    try {
+      if (!product || !product.id) throw new Error("Invalid product");
 
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products/?${query}`);
-  const data = await res.json();
-  setProducts(data.products);
-  setTotalPages(data.total_pages || 1);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  } catch (err) {
-    console.error("❌ Error fetching products", err);
-  }
-};
+      const productPrice = Number(product.price);
+      if (!product.price || productPrice === 0 || isNaN(productPrice)) {
+        toast({
+          title: "Désolé",
+          description: "Ce produit n'est pas disponible à la vente pour le moment.",
+          variant: "destructive",
+          duration: 3000,
+        });
+        return;
+      }
 
+      if (product.stock === 0 || product.in_stock === false) {
+        toast({
+          title: "Désolé",
+          description: "Ce produit est actuellement en rupture de stock.",
+          variant: "destructive",
+          duration: 3000,
+        });
+        return;
+      }
 
+      const imageUrl = product.image
+        ? `${import.meta.env.VITE_API_BASE_URL}${product.image}`
+        : "/placeholder.svg";
 
-  fetchFilters();
-  fetchProducts();
-}, [debouncedSearch, selectedCategories, priceRange, currentPage, selectedTags]);
+      requestAnimationFrame(() => {
+        addToCart({
+          id: product.id,
+          name: product.title || "Produit",
+          price: productPrice,
+          image: imageUrl,
+          quantity: 1
+        });
 
-
-useEffect(() => {
-  const handler = setTimeout(() => {
-    setDebouncedSearch(searchQuery);
-  }, 400); // 400ms delay
-
-  return () => clearTimeout(handler);
-}, [searchQuery]);
-
-
-
-
-const handleCategoryChange = (category: string, checked: boolean) => {
-  setCurrentPage(1);
-
-  if (checked) {
-    setSelectedCategories([...selectedCategories, category]);
-
-    // Auto-expand parent when selected
-    const parent = categories.find(cat => cat.slug === category && cat.children?.length > 0);
-    if (parent) {
-      setOpenParents(prev => ({ ...prev, [category]: true }));
-    }
-  } else {
-    setSelectedCategories(selectedCategories.filter(c => c !== category));
-  }
-};
-
-
-const handleTagToggle = (tag: string) => {
-  setCurrentPage(1); // reset pagination
-  setSelectedTags(prev =>
-    prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
-  );
-};
-
-const handlePriceChange = (newRange) => {
-  setPriceRange(newRange);
-  setPriceChanged(true);
-};
-
-
-
-
-// Improved handleAddToCart function with mobile optimizations
-const handleAddToCart = async (product) => {
-  // Prevent multiple rapid taps (common on mobile)
-  if (isAddingToCart) return;
-  setIsAddingToCart(true);
-
-  try {
-    if (!product || !product.id) throw new Error("Invalid product");
-
-    const imageUrl = product.image
-      ? `${import.meta.env.VITE_API_BASE_URL}${product.image}`
-      : "/placeholder.svg";
-
-    // Use requestAnimationFrame to ensure smooth UI updates
-    requestAnimationFrame(() => {
-      addToCart({
-        id: product.id,
-        name: product.title || "Produit",
-        price: Number(product.price) || 0,
-        image: imageUrl,
-        quantity: 1
+        setTimeout(() => {
+          toast({
+            title: "Produit ajouté au panier",
+            description: `${product.title || "Produit"} ajouté au panier.`,
+            duration: 2000,
+          });
+        }, 100);
       });
 
-      // Delay toast to prevent layout conflicts
-      setTimeout(() => {
-        toast({
-          title: "Produit ajouté au panier",
-          description: `${product.title || "Produit"} ajouté au panier.`,
-          duration: 2000, // Shorter duration on mobile
-        });
-      }, 100);
-    });
+    } catch (error) {
+      console.error("🛑 Failed to add to cart:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter le produit au panier.",
+        variant: "destructive",
+      });
+    } finally {
+      setTimeout(() => setIsAddingToCart(false), 500);
+    }
+  };
 
-  } catch (error) {
-    console.error("🛑 Failed to add to cart:", error);
-    toast({
-      title: "Erreur",
-      description: "Impossible d'ajouter le produit au panier.",
-      variant: "destructive",
-    });
-  } finally {
-    // Reset the flag after a short delay
-    setTimeout(() => setIsAddingToCart(false), 500);
-  }
-};
-
-// Add this state at the top of your component
-const [isAddingToCart, setIsAddingToCart] = useState(false);
-
-
-
-const clearFilters = () => {
-  setSearchQuery("");
-  setSelectedCategories([]);
-  setSelectedTags([]);
-  setPriceRange([0, 175000]);
-  setPriceChanged(false);
-  setCurrentPage(1);
-};
-
-
-
+  // FIXED clearFilters function
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategories([]);
+    setSelectedTags([]);
+    setPriceRange([0, 175000]);
+    setPriceChanged(false);
+    setCurrentPage(1);
+    
+    // Clear URL parameters as well
+    if (searchParams.get('brand') || searchParams.get('category')) {
+      navigate('/products', { replace: true });
+      setUrlParamsProcessed(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -372,17 +580,7 @@ const clearFilters = () => {
   setOpenParents={setOpenParents}
 />
 
-
 </aside>
-
-          {/* Mobile Filter Button */}
-{/* Mobile Filter Button */}
-
-{/* Mobile Filter Button */}
-
-
-
-
 
           {/* Products Grid */}
           <main  className="flex-1 mb-12">
@@ -431,9 +629,6 @@ const clearFilters = () => {
 
    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 [@media(min-width:1400px)]:grid-cols-4 gap-6">
 
-
-
-
 {products.map((product) => (
 <Card
   key={product.id}
@@ -481,10 +676,14 @@ const clearFilters = () => {
     <div className="flex justify-between items-end w-full">
       <div className="space-y-1 max-[559px]:space-y-0.5">
         <p className="text-2xl max-[1469px]:text-lg font-bold text-brand max-[1200px]:text-lg max-[559px]:text-lg max-[425px]:text-base">
-          {product.price && product.price !== 0 ? product.price + ' DZD' : 'unset'} 
+          {product.price && product.price !== 0 ? product.price + ' DZD' : 'Prix non disponible'} 
         </p>
-        <p className="text-xs font-medium text-success max-[559px]:text-[11px]">
-          ✓ En stock
+        <p className="text-xs font-medium max-[559px]:text-[11px]">
+          {product.stock === 0 || product.in_stock === false ? (
+            <span className="text-destructive">✗ Rupture de stock</span>
+          ) : (
+            <span className="text-success">✓ En stock</span>
+          )}
         </p>
       </div>
       <Button 
@@ -501,14 +700,15 @@ const clearFilters = () => {
   onClick={() => handleAddToCart(product)}
   size="sm"
   className="w-full max-[1200px]:text-xs max-[559px]:text-sm max-[559px]:h-8 max-[425px]:text-xs max-[425px]:h-7"
+  disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false}
 >
   <ShoppingCart className="h-4 w-4 mr-2 max-[1200px]:mr-0 max-[559px]:mr-1.5 max-[425px]:h-3.5 max-[425px]:w-3.5 max-[425px]:mr-1" />
-  Ajouter au panier
+  {!product.price || product.price === 0 ? "Indisponible" : 
+   product.stock === 0 || product.in_stock === false ? "Rupture de stock" : "Ajouter au panier"}
 </Button>
 
   </CardFooter>
 </Card>
-
 
 ))}
 
@@ -574,16 +774,9 @@ const clearFilters = () => {
   </div>
 )}
 
-
-
-
       <Footer />
     </div>
   );
 };
-
-
-
-
 
 export default Products;
