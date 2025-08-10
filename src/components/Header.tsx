@@ -159,15 +159,15 @@ const Header = () => {
 <div className="flex items-center space-x-4">
 
     {/* Login Button */}
-  <Button
-    variant="ghost"
-    size="sm"
-    className="flex  items-center gap-1 text-sm font-medium hover:text-brand transition-colors max-[992px]:px-2 max-[992px]:text-xs"
-    onClick={() => navigate('/login')}
-  >
-    <LogIn className="h-5 w-5" />
-    <span className="hidden sm:inline">Se connecter</span>
-  </Button>
+<Button
+  variant="ghost"
+  size="sm"
+  className="hidden md:flex items-center gap-1 text-sm font-medium hover:text-brand transition-colors max-[992px]:px-2 max-[992px]:text-xs"
+  onClick={() => navigate('/login')}
+>
+  <LogIn className="h-5 w-5" />
+  <span className="hidden sm:inline">Se connecter</span>
+</Button>
 
 
   {/* Cart */}
@@ -210,36 +210,51 @@ const Header = () => {
       </div>
 
       {/* Mobile Navigation */}
-      <div 
-        className={`md:hidden border-t border-border bg-background overflow-hidden transition-all duration-300 ease-in-out ${
-          isMenuOpen 
-            ? 'max-h-96 opacity-100' 
-            : 'max-h-0 opacity-0'
-        }`}
+<div 
+  className={`md:hidden border-t border-border bg-background overflow-hidden transition-all duration-300 ease-in-out ${
+    isMenuOpen 
+      ? 'max-h-96 opacity-100' 
+      : 'max-h-0 opacity-0'
+  }`}
+>
+  <nav className="container mx-auto px-4 py-4 space-y-4">
+    {navigation.map((item) => (
+      <a
+        key={item.name}
+        href={item.href}
+        className="block text-foreground hover:text-brand transition-colors font-medium"
+        onClick={() => setIsMenuOpen(false)}
       >
-        <nav className="container mx-auto px-4 py-4 space-y-4">
-          {navigation.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="block text-foreground hover:text-brand transition-colors font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {item.name}
-            </a>
-          ))}
-          <div className="pt-4 border-t border-border space-y-2 text-sm text-muted-foreground">
-            <div className="flex items-center space-x-2">
-              <Phone className="h-4 w-4 text-brand" />
-              <span>0550 45 24 66</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Mail className="h-4 w-4 text-brand" />
-              <span>contact@prochaudiere.com</span>
-            </div>
-          </div>
-        </nav>
+        {item.name}
+      </a>
+    ))}
+
+    {/* Mobile Login Button */}
+    <Button
+      variant="outline"
+      size="sm"
+      className="w-full flex items-center gap-2 justify-center"
+      onClick={() => {
+        navigate('/login');
+        setIsMenuOpen(false);
+      }}
+    >
+      <LogIn className="h-4 w-4" />
+      Se connecter
+    </Button>
+
+    <div className="pt-4 border-t border-border space-y-2 text-sm text-muted-foreground">
+      <div className="flex items-center space-x-2">
+        <Phone className="h-4 w-4 text-brand" />
+        <span>0550 45 24 66</span>
       </div>
+      <div className="flex items-center space-x-2">
+        <Mail className="h-4 w-4 text-brand" />
+        <span>contact@prochaudiere.com</span>
+      </div>
+    </div>
+  </nav>
+</div>
     </header>
   );
 };
