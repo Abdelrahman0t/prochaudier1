@@ -638,6 +638,7 @@ const Products = () => {
     <div className="aspect-[4/3] bg-secondary rounded-lg max-[559px]:rounded-md mb-4 max-[559px]:mb-3 flex items-center justify-center overflow-hidden">
 <img
   src={`${import.meta.env.VITE_API_BASE_URL}${product.image}`}
+  onClick={() => navigate(`/product/${product.id}`)}
   onError={(e) => {
     e.currentTarget.onerror = null;
     e.currentTarget.src = "/product_placeholder.jpg";
@@ -648,6 +649,7 @@ const Products = () => {
     </div>
     <div className="space-y-2 max-[559px]:space-y-1.5">
 <CardTitle className="text-lg font-semibold line-clamp-2 max-[425px]:text-xs max-[425px]:font-normal">
+  onClick={() => navigate(`/product/${product.id}`)}
         {product.title}
       </CardTitle>
       <p className="text-sm text-muted-foreground line-clamp-2 max-[559px]:text-xs">
