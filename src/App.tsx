@@ -7,6 +7,13 @@ import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ContactUs from "./pages/ContactUs";
 import APropos from "./pages/APropos";
+import CheckoutPage from './pages/CheckOut'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Profile from './pages/Profile'
+import Admin from "./pages/Admin";
+
+
 
 
 
@@ -27,7 +34,17 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/products" element={<Products />} />
           <Route path="/contactus" element={<ContactUs />} />
+          <Route path="/CheckOut" element={<CheckoutPage />} />
           <Route path="/Apropos" element={<APropos />} />
+          <Route path="/Login" element={<Login />} />
+          <Route path="/Register" element={<Register />} />
+          <Route path="/Profile" element={<Profile />} />
+          
+
+
+
+          <Route path="/Admin" element={<Admin />} />
+
 
           <Route path="/product/:id" element={<ProductDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -39,6 +56,3 @@ const App = () => (
 );
 
 export default App;
-
-
-

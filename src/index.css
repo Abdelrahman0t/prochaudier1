@@ -74,6 +74,7 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
   }
 
   .dark {
@@ -179,6 +180,7 @@ All colors MUST be HSL.
     background-color: #d4d4d8;
     border-radius: 4px;
   }
+  
 }
 
 @layer components {
@@ -250,6 +252,11 @@ All colors MUST be HSL.
   .bg-brand-dark {
     background-color: hsl(var(--brand-blue-dark));
   }
+
+  .no-space > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
 }
 
 
