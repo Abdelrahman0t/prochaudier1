@@ -32,7 +32,7 @@ const GoogleLogin = ({ onLoginSuccess }: GoogleLoginProps) => {
       if (window.google) {
         try {
           window.google.accounts.id.initialize({
-            client_id: "556405910731-vn1u2hilr38m4i27m15j5m50q2lcg02g.apps.googleusercontent.com",
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
             callback: handleCredentialResponse,
             auto_select: false,
             cancel_on_tap_outside: true
@@ -638,4 +638,5 @@ const handleSuccessfulAuth = async (data: any) => {
       </div>
     </div>
   );
+
 }
