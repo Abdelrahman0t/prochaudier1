@@ -1,12 +1,12 @@
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from 'lucide-react';
-
+import { FaTiktok } from 'react-icons/fa';
 const Footer = () => {
   const quickLinks = [
-    { name: 'Accueil', href: '#' },
-    { name: 'Produits', href: '#products' },
+    { name: 'Accueil', href: '/' },
+    { name: 'Produits', href: '/products' },
     { name: 'Catégories', href: '#categories' },
-    { name: 'À propos', href: '#about' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'À propos', href: '/apropos' },
+    { name: 'Contact', href: '/contactus' },
   ];
 
   const categories = [
@@ -33,9 +33,9 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { name: 'Facebook', icon: Facebook, href: '#' },
-    { name: 'Instagram', icon: Instagram, href: '#' },
-    { name: 'Twitter', icon: Twitter, href: '#' },
+    { name: 'Facebook', icon: Facebook, href: 'https://www.facebook.com/facofrisav?mibextid=wwXIfr&rdid=UsnyEiSTMN3T7wn7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2FPZRqibTLvZvnEyqC%2F%3Fmibextid%3DwwXIfr#' },
+    { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/prochaudiere/' },
+    { name: 'tiktok', icon: FaTiktok, href: 'https://www.tiktok.com/@prochaudiere?_t=8sdG4jikYFh&_r=1' },
     { name: 'YouTube', icon: Youtube, href: '#' },
   ];
 
@@ -150,19 +150,22 @@ const Footer = () => {
             {/* Social links */}
             <div className="flex items-center space-x-4">
               <span className="text-sm text-background/60 mr-2">Suivez-nous :</span>
-              {socialLinks.map((social) => {
-                const IconComponent = social.icon;
-                return (
-                  <a
-                    key={social.name}
-                    href={social.href}
-                    className="h-10 w-10 bg-background/10 rounded-full flex items-center justify-center hover:bg-brand transition-colors group"
-                    aria-label={social.name}
-                  >
-                    <IconComponent className="h-5 w-5 text-background/70 group-hover:text-white" />
-                  </a>
-                );
-              })}
+{socialLinks.map((social) => {
+  const IconComponent = social.icon;
+  return (
+    <a
+      key={social.name}
+      href={social.href}
+      target="_blank" // Opens in new tab
+      rel="noopener noreferrer" // Security best practice
+      className="h-10 w-10 bg-background/10 rounded-full flex items-center justify-center hover:bg-brand transition-colors group"
+      aria-label={social.name}
+    >
+      <IconComponent className="h-5 w-5 text-background/70 group-hover:text-white" />
+    </a>
+  );
+})}
+
             </div>
           </div>
 

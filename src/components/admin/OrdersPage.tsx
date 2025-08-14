@@ -122,7 +122,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onViewOrder }) => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `orders_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `orders_${new Date().toISOString().split('T')[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -219,45 +219,41 @@ return (
     )}
 
     {/* Debug Info */}
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-      <p className="text-blue-800 text-sm">
-        Debug: Loaded {orders.length} orders, showing {filteredOrders.length} filtered orders
-      </p>
-    </div>
+
 
     {/* Filters */}
-    <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-      <div className="grid grid-cols-1 gap-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Search by customer name, email, phone, or order ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-          />
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as Order['status'] | 'all')}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipping">Shipping</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2">
-            <Filter className="w-4 h-4" />
-            <span>More Filters</span>
-          </button>
-        </div>
-      </div>
+<div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+  <div className="flex flex-col sm:flex-row gap-4">
+    {/* Search input */}
+    <div className="relative flex-1">
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+      <input
+        type="text"
+        placeholder="Search by customer name, email, phone, or order ID..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+      />
     </div>
+
+    {/* Status filter */}
+    <select
+      value={statusFilter}
+      onChange={(e) =>
+        setStatusFilter(e.target.value as Order['status'] | 'all')
+      }
+      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+    >
+      <option value="all">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="processing">Processing</option>
+      <option value="shipping">Shipping</option>
+      <option value="delivered">Delivered</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+  </div>
+</div>
+
 
     {/* Bulk Actions (Mobile) */}
     {selectedOrders.length > 0 && (
@@ -317,6 +313,7 @@ return (
                   <Eye className="w-4 h-4" />
                 </button>
                 <button 
+                onClick={() => onViewOrder(order)}
                   className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-50 transition-colors"
                   title="More actions"
                 >
@@ -472,6 +469,7 @@ return (
                         <Eye className="w-4 h-4" />
                       </button>
                       <button 
+                      onClick={() => onViewOrder(order)}
                         className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-50 transition-colors"
                         title="More actions"
                       >

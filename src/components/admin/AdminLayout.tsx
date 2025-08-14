@@ -48,8 +48,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage, onPage
       `}>
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center">
-              <Package className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center">
+              <img src="/small_icon.png" alt="" />
             </div>
             <h1 className="text-xl font-bold text-gray-800">Admin Panel</h1>
           </div>
@@ -107,8 +107,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage, onPage
             </h2>
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-800">Admin User</p>
-                <p className="text-xs text-gray-500">admin@company.com</p>
+                <p className="text-sm font-medium text-gray-800">Admin Chaud</p>
+                <p className="text-xs text-gray-500">admin@prochaudiere.com</p>
               </div>
               <div className="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-medium">A</span>
