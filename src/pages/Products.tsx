@@ -109,7 +109,7 @@ const FilterSidebar = ({
       </div>
 
       <div>
-        <h3 className="font-semibold text-foreground mb-3">Tags populaires</h3>
+        <h3 className="font-semibold text-foreground mb-3">Nos Marques</h3>
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
             <Badge
@@ -188,6 +188,20 @@ const Products = () => {
   const [openParents, setOpenParents] = useState<Record<string, boolean>>({});
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [urlParamsProcessed, setUrlParamsProcessed] = useState(false);
+
+  // NEW: Check if user is on mobile and auto-open filters
+  useEffect(() => {
+    const isMobile = window.innerWidth < 1024; // lg breakpoint
+    const openFilters = searchParams.get('openFilters') === 'true';
+    
+    if (isMobile && openFilters) {
+      setIsMobileFiltersOpen(true);
+      // Clean up URL parameter after opening
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete('openFilters');
+      navigate(`/products?${newSearchParams.toString()}`, { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   // Handle brand and category parameters from URL - FIXED VERSION
   useEffect(() => {

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Minus, ShoppingCart, Heart, Share2, Star } from 'lucide-react';
+import { ArrowLeft, Plus, Minus, ShoppingCart, Heart, Share2, Star, ZoomIn, ZoomOut, ExternalLink, RotateCcw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,33 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Advanced zoom and pan state
+  const [scale, setScale] = useState(1);
+  const [translateX, setTranslateX] = useState(0);
+  const [translateY, setTranslateY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastPointerPos, setLastPointerPos] = useState({ x: 0, y: 0 });
+  const imageContainerRef = useRef(null);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Reset zoom when image changes
+  useEffect(() => {
+    setScale(1);
+    setTranslateX(0);
+    setTranslateY(0);
+  }, [selectedImage]);
 
   // Scroll to top when component mounts or product ID changes
   useEffect(() => {
@@ -44,7 +71,6 @@ const ProductDetail = () => {
         
         // Fetch related products from the same category
         if (data.categories && data.categories.length > 0) {
-          // ✅ FIX: Use category name directly since API now returns strings
           const categoryParam = data.categories[0]; 
           const relatedResponse = await fetch(
             `${import.meta.env.VITE_API_BASE_URL}/api/products/?categories=${categoryParam}&limit=3`
@@ -52,10 +78,8 @@ const ProductDetail = () => {
           
           if (relatedResponse.ok) {
             const relatedData = await relatedResponse.json();
-            // Filter out current product
             const filtered = relatedData.products.filter(p => p.id !== parseInt(id));
             setRelatedProducts(filtered.slice(0, 3));
-            console.log(filtered.slice(0, 3))
           }
         }
       } catch (err) {
@@ -108,6 +132,112 @@ const ProductDetail = () => {
     setQuantity(prev => Math.max(prev - 1, 1));
   };
 
+  // Zoom functions
+  const zoomIn = () => {
+    setScale(prev => Math.min(prev * 1.5, 5)); // Max 5x zoom
+  };
+
+  const zoomOut = () => {
+    setScale(prev => Math.max(prev / 1.5, 1)); // Min 1x zoom
+  };
+
+  const resetZoom = () => {
+    setScale(1);
+    setTranslateX(0);
+    setTranslateY(0);
+  };
+
+  // Handle pointer events (works for both mouse and touch)
+  const handlePointerDown = (e) => {
+    if (scale <= 1) return; // Only allow dragging when zoomed
+    
+    setIsDragging(true);
+    const pointer = e.touches ? e.touches[0] : e;
+    setLastPointerPos({ x: pointer.clientX, y: pointer.clientY });
+    e.preventDefault();
+  };
+
+  const handlePointerMove = (e) => {
+    if (!isDragging || scale <= 1) return;
+    
+    const pointer = e.touches ? e.touches[0] : e;
+    const deltaX = pointer.clientX - lastPointerPos.x;
+    const deltaY = pointer.clientY - lastPointerPos.y;
+    
+    // Calculate movement constraints based on zoom level
+    const container = imageContainerRef.current;
+    if (container) {
+      const containerRect = container.getBoundingClientRect();
+      const maxTranslateX = (containerRect.width * (scale - 1)) / 2;
+      const maxTranslateY = (containerRect.height * (scale - 1)) / 2;
+      
+      setTranslateX(prev => Math.max(-maxTranslateX, Math.min(maxTranslateX, prev + deltaX)));
+      setTranslateY(prev => Math.max(-maxTranslateY, Math.min(maxTranslateY, prev + deltaY)));
+    }
+    
+    setLastPointerPos({ x: pointer.clientX, y: pointer.clientY });
+    e.preventDefault();
+  };
+
+  const handlePointerUp = () => {
+    setIsDragging(false);
+  };
+
+  // Handle wheel zoom on desktop
+  const handleWheel = (e) => {
+    if (!e.ctrlKey && !isMobile) return; // Only zoom with Ctrl+scroll on desktop
+    
+    e.preventDefault();
+    const delta = e.deltaY;
+    
+    if (delta < 0) {
+      zoomIn();
+    } else {
+      zoomOut();
+    }
+  };
+
+  // Handle pinch-to-zoom on mobile
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      // Pinch gesture detected
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch1.clientX - touch2.clientX,
+        touch1.clientY - touch2.clientY
+      );
+      setLastPointerPos({ x: 0, y: distance }); // Store initial pinch distance
+      e.preventDefault();
+    } else {
+      handlePointerDown(e);
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 2) {
+      // Handle pinch-to-zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch1.clientX - touch2.clientX,
+        touch1.clientY - touch2.clientY
+      );
+      
+      const scaleChange = distance / lastPointerPos.y;
+      setScale(prev => Math.max(1, Math.min(5, prev * scaleChange)));
+      setLastPointerPos({ x: 0, y: distance });
+      e.preventDefault();
+    } else {
+      handlePointerMove(e);
+    }
+  };
+
+  // Open image in new tab
+  const openImageInNewTab = (imageUrl) => {
+    window.open(imageUrl, '_blank');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -142,7 +272,7 @@ const ProductDetail = () => {
     );
   }
 
-  // ✅ FIX: Build product image gallery from multiple sources
+  // Build product image gallery from multiple sources
   const getProductImages = () => {
     const images = [];
     
@@ -196,7 +326,6 @@ const ProductDetail = () => {
           <span>/</span>
           {product.categories && product.categories.length > 0 && (
             <>
-              {/* ✅ FIX: Categories are now strings, not objects */}
               <span>{product.categories[0]}</span>
               <span>/</span>
             </>
@@ -204,29 +333,110 @@ const ProductDetail = () => {
           <span className="text-foreground">{product.title}</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 lg:mb-12">
           {/* Product Images */}
-          <div className="space-y-4">
-            <div className="aspect-square bg-secondary rounded-lg overflow-hidden">
-              <img 
-                src={currentImage}
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = "/placeholder.svg";
+          <div className="space-y-3 lg:space-y-4">
+            <div 
+              ref={imageContainerRef}
+              className="relative group aspect-square bg-secondary rounded-lg overflow-hidden select-none"
+              onWheel={handleWheel}
+              onMouseDown={handlePointerDown}
+              onMouseMove={handlePointerMove}
+              onMouseUp={handlePointerUp}
+              onMouseLeave={handlePointerUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handlePointerUp}
+              style={{ touchAction: scale > 1 ? 'none' : 'auto' }}
+            >
+              <div
+                className="w-full h-full transition-transform duration-200 ease-out"
+                style={{
+                  transform: `scale(${scale}) translate(${translateX / scale}px, ${translateY / scale}px)`,
+                  cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'
                 }}
-                alt={product.title}
-                className="w-full h-full object-cover"
-              />
+              >
+                <img 
+                  src={currentImage}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = "/placeholder.svg";
+                  }}
+                  alt={product.title}
+                  className="w-full h-full object-cover pointer-events-none"
+                  draggable={false}
+                />
+              </div>
+              
+              {/* Enhanced control buttons */}
+              <div className="absolute top-2 right-2 flex flex-col gap-1.5 opacity-100 lg:opacity-80 lg:group-hover:opacity-100 transition-opacity duration-200">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 w-8 p-0 shadow-lg"
+                  onClick={zoomIn}
+                  disabled={scale >= 5}
+                  title="Zoomer (Ctrl+Molette)"
+                >
+                  <ZoomIn className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 w-8 p-0 shadow-lg"
+                  onClick={zoomOut}
+                  disabled={scale <= 1}
+                  title="Dézoomer"
+                >
+                  <ZoomOut className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 w-8 p-0 shadow-lg"
+                  onClick={resetZoom}
+                  disabled={scale === 1 && translateX === 0 && translateY === 0}
+                  title="Réinitialiser"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="h-8 w-8 p-0 shadow-lg"
+                  onClick={() => openImageInNewTab(currentImage)}
+                  title="Ouvrir dans un nouvel onglet"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {/* Dynamic status indicator */}
+              <div className="absolute bottom-2 left-2 bg-black/75 text-white px-2 py-1 rounded text-xs opacity-80">
+                {scale > 1 ? (
+                  <div className="flex items-center gap-1">
+                    <span>{Math.round(scale * 100)}%</span>
+                    <span>•</span>
+                    <span>{isMobile ? 'Glisser ou pincer' : 'Glisser ou Ctrl+Molette'}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <ZoomIn className="h-3 w-3" />
+                    <span>{isMobile ? 'Pincer pour zoomer' : 'Cliquer ou Ctrl+Molette'}</span>
+                  </div>
+                )}
+              </div>
             </div>
-            {/* ✅ FIX: Show actual images instead of duplicates */}
+            
+            {/* Thumbnail gallery */}
             {productImages.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
-                {productImages.slice(0, 4).map((imageUrl, index) => (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {productImages.slice(0, isMobile ? 3 : 4).map((imageUrl, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`aspect-square bg-secondary rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImage === index ? 'border-brand' : 'border-transparent'
+                    className={`aspect-square bg-secondary rounded-lg overflow-hidden border-2 transition-all duration-200 hover:border-brand/50 ${
+                      selectedImage === index ? 'border-brand ring-2 ring-brand/20' : 'border-transparent'
                     }`}
                   >
                     <img 
@@ -236,7 +446,7 @@ const ProductDetail = () => {
                         e.currentTarget.src = "/placeholder.svg";
                       }}
                       alt={`${product.title} ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                     />
                   </button>
                 ))}
@@ -249,7 +459,6 @@ const ProductDetail = () => {
             <div>
               {product.categories && product.categories.length > 0 && (
                 <Badge variant="secondary" className="mb-2">
-                  {/* ✅ FIX: Categories are now strings */}
                   {product.categories[0]}
                 </Badge>
               )}
@@ -262,7 +471,7 @@ const ProductDetail = () => {
                     <Star 
                       key={i} 
                       className={`h-4 w-4 ${
-                        i < 4 // Default rating since API doesn't provide it
+                        i < 4 
                           ? 'fill-brand text-brand' 
                           : 'text-muted-foreground'
                       }`} 
@@ -296,7 +505,6 @@ const ProductDetail = () => {
 
               {product.tags && product.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {/* ✅ FIX: Tags are now strings, not objects */}
                   {product.tags.map((tag, index) => (
                     <Badge key={index} variant="outline">
                       {tag}
@@ -340,23 +548,23 @@ const ProductDetail = () => {
               </div>
 
               <div className="flex gap-3">
-<Button 
-  onClick={() => handleAddToCart(product)}
-  size="sm"
-  className="w-full max-[1200px]:text-xs max-[559px]:text-sm max-[559px]:h-8 max-[425px]:text-xs max-[425px]:h-7"
-  disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'}
->
-  <ShoppingCart className="h-4 w-4 mr-2 max-[1200px]:mr-0 max-[559px]:mr-1.5 max-[425px]:h-3.5 max-[425px]:w-3.5 max-[425px]:mr-1" />
-  {!product.price || product.price === 0 ? "Indisponible" : 
-   product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock' ? "Rupture de stock" : "Ajouter au panier"}
-</Button>
+                <Button 
+                  onClick={() => handleAddToCart(product)}
+                  size="sm"
+                  className="w-full max-[1200px]:text-xs max-[559px]:text-sm max-[559px]:h-8 max-[425px]:text-xs max-[425px]:h-7"
+                  disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2 max-[1200px]:mr-0 max-[559px]:mr-1.5 max-[425px]:h-3.5 max-[425px]:w-3.5 max-[425px]:mr-1" />
+                  {!product.price || product.price === 0 ? "Indisponible" : 
+                   product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock' ? "Rupture de stock" : "Ajouter au panier"}
+                </Button>
               </div>
             </div>
           </div>
         </div>
 
         {/* Product Details Tabs */}
-        <Tabs defaultValue="description" className="mb-12">
+        <Tabs defaultValue="description" className="mb-8 lg:mb-12">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="description">Description</TabsTrigger>
             <TabsTrigger value="specifications">Caractéristiques</TabsTrigger>
@@ -389,7 +597,6 @@ const ProductDetail = () => {
                   <div className="flex justify-between py-2 border-b border-border/50">
                     <span className="font-medium">Marques:</span>
                     <span className="text-muted-foreground">
-                      {/* ✅ FIX: Tags are now strings, not objects */}
                       {product.tags?.length > 0 ? product.tags.join(', ') : 'Non spécifié'}
                     </span>
                   </div>
@@ -397,7 +604,6 @@ const ProductDetail = () => {
                     <div className="flex justify-between py-2 border-b border-border/50">
                       <span className="font-medium">Catégories:</span>
                       <span className="text-muted-foreground">
-                        {/* ✅ FIX: Categories are now strings, not objects */}
                         {product.categories.join(', ')}
                       </span>
                     </div>
@@ -446,7 +652,6 @@ const ProductDetail = () => {
                       </div>
                       {relatedProduct.categories && relatedProduct.categories.length > 0 && (
                         <Badge variant="secondary" className="text-xs mb-2">
-                          {/* ✅ FIX: Categories in related products are also strings now */}
                           {relatedProduct.categories[0]}
                         </Badge>
                       )}
