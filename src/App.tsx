@@ -9,7 +9,7 @@ import ContactUs from "./pages/ContactUs";
 import APropos from "./pages/APropos";
 import CheckoutPage from './pages/CheckOut'
 import Login from './pages/Login'
-import Register from './pages/Register'
+import Register from './pages/register'
 import Profile from './pages/Profile'
 import Admin from "./pages/Admin";
 
