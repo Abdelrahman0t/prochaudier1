@@ -28,6 +28,7 @@ const FilterSidebar = ({
   clearFilters,
   openParents,
   setOpenParents,
+  isMobile = false, // New prop to distinguish mobile vs desktop
 }) => {
 
   const toggleParent = (slug) => {
@@ -48,6 +49,14 @@ const FilterSidebar = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
+            autoFocus={false} // Explicitly disable autofocus
+            tabIndex={isMobile ? -1 : 0} // Prevent focus on mobile
+            onFocus={(e) => {
+              // Prevent focus on mobile to avoid keyboard popup
+              if (isMobile && window.innerWidth < 1024) {
+                e.target.blur();
+              }
+            }}
           />
         </div>
       </div>
@@ -593,6 +602,7 @@ const Products = () => {
   clearFilters={clearFilters}
   openParents={openParents}
   setOpenParents={setOpenParents}
+  isMobile={false} // Desktop version
 />
 
 </aside>
@@ -632,6 +642,7 @@ const Products = () => {
   clearFilters={clearFilters}
   openParents={openParents}
   setOpenParents={setOpenParents}
+  isMobile={true} // Mobile version
 />
 
     </div>
