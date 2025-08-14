@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import tokenManager from '../utils/tokenManager'; // Import the token manager
+import { useAuth } from '../hooks/useAuth';
+import { apiPost } from '../utils/api';
+
 // Type declaration for the Google API
 declare global {
   interface Window {
@@ -174,75 +177,79 @@ export default function AuthPage({ onLoginSuccess }: AuthPageProps) {
 
 
   // Function to merge guest orders after successful authentication
-  const mergeGuestOrders = async (accessToken: string) => {
-    const guestId = localStorage.getItem('guest_id');
-    if (!guestId) {
-      console.log('No guest_id found, skipping merge');
-      return;
-    }
+// Function to merge guest orders after successful authentication
+// Function to merge guest orders after successful authentication
+// Function to merge guest orders after successful authentication
+const mergeGuestOrders = async (accessToken: string) => {
+  const guestId = localStorage.getItem('guest_id');
+  if (!guestId) {
+    console.log('No guest_id found, skipping merge');
+    return;
+  }
 
-    try {
-      console.log('Attempting to merge guest orders for guest_id:', guestId);
-      
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}api/merge-guest-orders/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ guest_id: guestId }),
-      });
+  try {
+    // Just use the fresh token directly - don't mess with storage
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}api/merge-guest-orders/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({ guest_id: guestId })
+    });
 
-      const data = await response.json();
-      
-      if (response.ok) {
-        console.log('Guest orders merged successfully:', data);
-        localStorage.removeItem('guest_id');
-      } else {
-        console.warn('Failed to merge guest orders:', data);
-      }
-    } catch (error) {
-      console.warn('Error during guest order merge:', error);
+    const data = await response.json();
+    
+    if (response.ok) {
+      console.log('Guest orders merged successfully:', data);
+      localStorage.removeItem('guest_id');
+    } else {
+      console.warn('Failed to merge guest orders:', data);
     }
-  };
+  } catch (error) {
+    console.warn('Error during guest order merge:', error);
+  }
+};
 
   // Modified function to handle successful authentication with token management
-  const handleSuccessfulAuth = async (data: any) => {
-    console.log("Authentication successful:", data);
-    
-    // Use token manager to store tokens with automatic expiration
-    tokenManager.storeTokens(data);
-    
-    // Try to merge guest orders if user just authenticated
-    await mergeGuestOrders(data.access);
-    
-    // Store user data
-    const userData = data.user || {};
-    const username = userData.username || loginData.username || registerData.username;
-    
-    // Show success message first
-    const welcomeMessage = data.is_new_user 
-      ? `Welcome to our platform, ${userData.first_name || userData.email || username}! Your account has been created.`
-      : `Welcome back, ${userData.first_name || userData.email || username}!`;
-    
-    setSuccess(welcomeMessage);
-    setRedirecting(true);
+// Modified function to handle successful authentication with token management
+// Modified function to handle successful authentication with token management
+const handleSuccessfulAuth = async (data: any) => {
+  console.log("Authentication successful:", data);
+  
+  // Store tokens FIRST so they're available for API calls
+  tokenManager.storeTokens(data);
+  
+  // Try to merge guest orders with the fresh token
+  await mergeGuestOrders(data.access);
+  
+  // Store user data
+  const userData = data.user || {};
+  const username = userData.username || loginData.username || registerData.username;
+  
+  // Show success message first
+  const welcomeMessage = data.is_new_user 
+    ? `Welcome to our platform, ${userData.first_name || userData.email || username}! Your account has been created.`
+    : `Welcome back, ${userData.first_name || userData.email || username}!`;
+  
+  setSuccess(welcomeMessage);
+  setRedirecting(true);
 
-    // Determine redirect path based on username
-    const redirectPath = username === "pro_chaud_admin" ? "/admin" : "/";
-    
-    // If onLoginSuccess callback is provided, use it
-    if (onLoginSuccess) {
-      onLoginSuccess({ ...data, redirectPath });
-      return;
-    }
+  // Determine redirect path based on username
+  const redirectPath = username === "pro_chaud_admin" ? "/admin" : "/";
+  
+  // If onLoginSuccess callback is provided, use it
+  if (onLoginSuccess) {
+    onLoginSuccess({ ...data, redirectPath });
+    return;
+  }
 
-    // Perform actual redirect after showing success message
-    setTimeout(() => {
-      console.log(`Redirecting ${username} to ${redirectPath}`);
-      navigate(redirectPath);
-    }, 2000);
-  };
+  // Perform actual redirect after showing success message
+  setTimeout(() => {
+    console.log(`Redirecting ${username} to ${redirectPath}`);
+    navigate(redirectPath);
+  }, 2000);
+};
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });

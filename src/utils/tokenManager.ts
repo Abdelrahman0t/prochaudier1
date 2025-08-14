@@ -17,12 +17,10 @@ class TokenManager {
     this.setupVisibilityListener();
   }
 
-  // Set token expiration time (default: 1 hour)
-private getExpirationTime(): number {
-  return 24 * 60 * 60 * 1000; // 1 day in milliseconds
-}
-
-
+  // Set token expiration time (default: 1 day)
+  private getExpirationTime(): number {
+    return 24 * 60 * 60 * 1000; // 1 day in milliseconds
+  }
 
   // Store tokens with expiration timestamp
   storeTokens(data: any, customExpiration?: number): void {
@@ -200,7 +198,7 @@ private getExpirationTime(): number {
     }
 
     // Redirect to login if not already there
-    if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/login')) {
+    if (!window.location.pathname.includes('/login')) {
       console.log("🔄 Redirecting to login due to token expiration");
       window.location.href = '/login';
     }
@@ -247,150 +245,3 @@ private getExpirationTime(): number {
 // Create and export singleton instance
 const tokenManager = new TokenManager();
 export default tokenManager;
-
-// src/hooks/useAuth.ts - Custom hook for authentication
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import tokenManager from '../utils/tokenManager';
-
-export const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  // Check authentication status
-  const checkAuth = useCallback(() => {
-    const token = tokenManager.getValidToken();
-    const userData = tokenManager.getUserData();
-    
-    setIsAuthenticated(!!token);
-    setUser(userData);
-    setLoading(false);
-    
-    return !!token;
-  }, []);
-
-  // Login function
-  const login = useCallback((authData: any) => {
-    tokenManager.storeTokens(authData);
-    setIsAuthenticated(true);
-    setUser(authData.user || {});
-  }, []);
-
-  // Logout function
-  const logout = useCallback(() => {
-    tokenManager.clearAllTokens();
-    setIsAuthenticated(false);
-    setUser(null);
-    navigate('/login');
-  }, [navigate]);
-
-  // Get valid token
-  const getToken = useCallback(() => {
-    return tokenManager.getValidToken();
-  }, []);
-
-  // Handle token expiration
-  useEffect(() => {
-    const handleTokenExpired = () => {
-      console.log('Token expired event received');
-      setIsAuthenticated(false);
-      setUser(null);
-      // Optionally show a notification here
-    };
-
-    window.addEventListener('tokenExpired', handleTokenExpired);
-    return () => window.removeEventListener('tokenExpired', handleTokenExpired);
-  }, []);
-
-  // Initial auth check
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  return {
-    isAuthenticated,
-    user,
-    loading,
-    login,
-    logout,
-    getToken,
-    checkAuth
-  };
-};
-
-// src/utils/api.ts - API utility with automatic token management
-import tokenManager from './tokenManager';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/';
-
-interface RequestOptions extends RequestInit {
-  skipAuth?: boolean;
-}
-
-export const apiRequest = async (
-  endpoint: string, 
-  options: RequestOptions = {}
-): Promise<Response> => {
-  const { skipAuth = false, headers = {}, ...restOptions } = options;
-  
-  const url = `${API_BASE_URL}${endpoint}`;
-  
-  // Add authorization header if not skipping auth
-  if (!skipAuth) {
-    const token = tokenManager.getValidToken();
-    if (token) {
-      (headers as any)['Authorization'] = `Bearer ${token}`;
-    } else if (tokenManager.isAuthenticated() === false) {
-      // Token was expired and cleaned up
-      throw new Error('Authentication required');
-    }
-  }
-
-  // Add default content type
-  if (!headers.hasOwnProperty('Content-Type') && (restOptions.method === 'POST' || restOptions.method === 'PUT')) {
-    (headers as any)['Content-Type'] = 'application/json';
-  }
-
-  try {
-    const response = await fetch(url, {
-      ...restOptions,
-      headers
-    });
-
-    // Handle 401 responses (token might be invalid on server)
-    if (response.status === 401 && !skipAuth) {
-      console.log('🔐 Received 401, clearing tokens');
-      tokenManager.clearAllTokens();
-      window.dispatchEvent(new CustomEvent('tokenExpired'));
-      throw new Error('Authentication failed');
-    }
-
-    return response;
-  } catch (error) {
-    console.error('API request failed:', error);
-    throw error;
-  }
-};
-
-// Convenience methods
-export const apiGet = (endpoint: string, options?: RequestOptions) => 
-  apiRequest(endpoint, { ...options, method: 'GET' });
-
-export const apiPost = (endpoint: string, data?: any, options?: RequestOptions) =>
-  apiRequest(endpoint, { 
-    ...options, 
-    method: 'POST', 
-    body: data ? JSON.stringify(data) : undefined 
-  });
-
-export const apiPut = (endpoint: string, data?: any, options?: RequestOptions) =>
-  apiRequest(endpoint, { 
-    ...options, 
-    method: 'PUT', 
-    body: data ? JSON.stringify(data) : undefined 
-  });
-
-export const apiDelete = (endpoint: string, options?: RequestOptions) =>
-  apiRequest(endpoint, { ...options, method: 'DELETE' });

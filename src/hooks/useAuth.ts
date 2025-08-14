@@ -46,6 +46,7 @@ export const useAuth = () => {
       console.log('Token expired event received');
       setIsAuthenticated(false);
       setUser(null);
+      // Optionally show a notification here
     };
 
     window.addEventListener('tokenExpired', handleTokenExpired);
