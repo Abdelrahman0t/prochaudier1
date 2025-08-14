@@ -200,7 +200,10 @@ const navigate = useNavigate();
       // Prepare order data for your Django backend
       const orderData = {
         customer: customerInfo,
-        shipping: shippingInfo,
+        shipping: {
+    ...shippingInfo,
+    postalCode: shippingInfo.postalCode.trim() === '' ? 'unset' : shippingInfo.postalCode
+  },
         items: cartItems.map(item => ({
           product_id: item.id,
           quantity: item.quantity,
@@ -425,14 +428,25 @@ const OrderSummary = ({ isMobile = false }) => (
     </Button>
     
     {/* Secondary Button */}
-    <Button 
-      onClick={() => navigate('/login', { replace: true })}
-      variant="secondary"
-      className="border-2"
-    >
-      <LogIn className="w-4 h-4" />
-      Se connecter pour suivre vos commandes
-    </Button>
+{isUserAuthenticated() ? (
+  <Button 
+    onClick={() => navigate('/profile', { replace: true })}
+    variant="secondary"
+    className="border-2"
+  >
+    <User className="w-4 h-4" />
+    Voir vos commandes dans votre profil
+  </Button>
+) : (
+  <Button 
+    onClick={() => navigate('/login', { replace: true })}
+    variant="secondary"
+    className="border-2"
+  >
+    <LogIn className="w-4 h-4" />
+    Se connecter pour suivre vos commandes
+  </Button>
+)}
   </div>
 </div>
 
@@ -593,7 +607,9 @@ const OrderSummary = ({ isMobile = false }) => (
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="postalCode">Code postal</Label>
+                    <Label htmlFor="postalCode">
+  Code postal <span className="text-xs text-gray-500 font-normal">(optionnel)</span>
+</Label>
                     <Input
                       id="postalCode"
                       type="text"
@@ -603,24 +619,68 @@ const OrderSummary = ({ isMobile = false }) => (
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="region">Gouvernorat *</Label>
-                  <Select value={shippingInfo.region} onValueChange={(value) => handleShippingInfoChange('region', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un gouvernorat" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="tunis">Tunis</SelectItem>
-                      <SelectItem value="ariana">Ariana</SelectItem>
-                      <SelectItem value="ben-arous">Ben Arous</SelectItem>
-                      <SelectItem value="manouba">Manouba</SelectItem>
-                      <SelectItem value="sousse">Sousse</SelectItem>
-                      <SelectItem value="monastir">Monastir</SelectItem>
-                      <SelectItem value="sfax">Sfax</SelectItem>
-                      <SelectItem value="autres">Autres</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+<div className="space-y-2">
+  <Label htmlFor="region">Wilaya *</Label>
+  <Select
+    value={shippingInfo.region}
+    onValueChange={(value) => handleShippingInfoChange('region', value)}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Choisir la wilaya" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="adrar">Adrar</SelectItem>
+      <SelectItem value="ain-defla">Ain Defla</SelectItem>
+      <SelectItem value="ain-temouchent">Ain Temouchent</SelectItem>
+      <SelectItem value="algiers">Alger</SelectItem>
+      <SelectItem value="annaba">Annaba</SelectItem>
+      <SelectItem value="batna">Batna</SelectItem>
+      <SelectItem value="bechar">Bechar</SelectItem>
+      <SelectItem value="bejaia">Bejaia</SelectItem>
+      <SelectItem value="biskra">Biskra</SelectItem>
+      <SelectItem value="blida">Blida</SelectItem>
+      <SelectItem value="bordj-bou-arreridj">Bordj Bou Arreridj</SelectItem>
+      <SelectItem value="bouira">Bouira</SelectItem>
+      <SelectItem value="boumerdes">Boumerdes</SelectItem>
+      <SelectItem value="chlef">Chlef</SelectItem>
+      <SelectItem value="constantine">Constantine</SelectItem>
+      <SelectItem value="djelfa">Djelfa</SelectItem>
+      <SelectItem value="el-bayadh">El Bayadh</SelectItem>
+      <SelectItem value="el-oued">El Oued</SelectItem>
+      <SelectItem value="el-tarf">El Tarf</SelectItem>
+      <SelectItem value="ghardaia">Ghardaia</SelectItem>
+      <SelectItem value="guelma">Guelma</SelectItem>
+      <SelectItem value="illizi">Illizi</SelectItem>
+      <SelectItem value="jijel">Jijel</SelectItem>
+      <SelectItem value="khenchela">Khenchela</SelectItem>
+      <SelectItem value="laghouat">Laghouat</SelectItem>
+      <SelectItem value="mascara">Mascara</SelectItem>
+      <SelectItem value="medea">Medea</SelectItem>
+      <SelectItem value="mila">Mila</SelectItem>
+      <SelectItem value="mostaganem">Mostaganem</SelectItem>
+      <SelectItem value="msila">Msila</SelectItem>
+      <SelectItem value="naama">Naama</SelectItem>
+      <SelectItem value="oran">Oran</SelectItem>
+      <SelectItem value="ouargla">Ouargla</SelectItem>
+      <SelectItem value="oum-el-bouaghi">Oum El Bouaghi</SelectItem>
+      <SelectItem value="relizane">Relizane</SelectItem>
+      <SelectItem value="saida">Saida</SelectItem>
+      <SelectItem value="setif">Setif</SelectItem>
+      <SelectItem value="sidi-bel-abbes">Sidi Bel Abbes</SelectItem>
+      <SelectItem value="skikda">Skikda</SelectItem>
+      <SelectItem value="soukahras">Souk Ahras</SelectItem>
+      <SelectItem value="tamanrasset">Tamanrasset</SelectItem>
+      <SelectItem value="tebessa">Tebessa</SelectItem>
+      <SelectItem value="tindouf">Tindouf</SelectItem>
+      <SelectItem value="tipaza">Tipaza</SelectItem>
+      <SelectItem value="tissemsilt">Tissemsilt</SelectItem>
+      <SelectItem value="tizi-ouzou">Tizi Ouzou</SelectItem>
+      <SelectItem value="tiaret">Tiaret</SelectItem>
+      <SelectItem value="tlemcen">Tlemcen</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+
                 <div className="space-y-2">
                   <Label htmlFor="additionalInfo">Informations supplémentaires</Label>
                   <Textarea
