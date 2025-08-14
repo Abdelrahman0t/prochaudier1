@@ -1,76 +1,77 @@
-import { Wrench, Zap, Droplets, Gauge, Filter, Settings, Flame, Shield } from 'lucide-react';
+// ADD THIS LINE INSTEAD
+import { Wrench, Cpu, Droplets, Waves, GitBranch, Radar, ArrowLeftRight, Fan, ShieldCheck } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
 
 const Categories = () => {
   const navigate = useNavigate();
   
-  const categories = [
-    {
-      name: "Carte électronique",
-      slug: "carte-electronique", // Matches your actual category
-      count: "17 produits",
-      icon: Zap,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
-    {
-      name: "Modules Hydrauliques",
-      slug: "modules-hydrauliques", // Matches your actual category
-      count: "24 produits", 
-      icon: Droplets,
-      color: "text-cyan-600",
-      bgColor: "bg-cyan-50",
-    },
-    {
-      name: "Pompe",
-      slug: "pompe", // Matches your actual category
-      count: "19 produits",
-      icon: Settings,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      name: "Vannes 3 voies",
-      slug: "vannes-3-voies", // Matches your actual category
-      count: "16 produits",
-      icon: Wrench,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-    },
-    {
-      name: "Capteur",
-      slug: "capteur", // Matches your actual category
-      count: "11 produits",
-      icon: Gauge,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
-    {
-      name: "ÉCHANGEURS",
-      slug: "echangeurs", // Matches your actual category
-      count: "15 produits", // Combined count from ÉCHANGEURS(6) + ECHANGEURS SECONDAIRES(9)
-      icon: Filter,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-    },
-    {
-      name: "Ventilateurs chaudière",
-      slug: "ventilateurs-chaudiere", // Matches your actual category
-      count: "7 produits",
-      icon: Flame,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
-    },
-    {
-      name: "Soupape chaudière",
-      slug: "soupape-chaudiere", // Matches your actual category
-      count: "6 produits",
-      icon: Shield,
-      color: "text-pink-600",
-      bgColor: "bg-pink-50",
-    },
-  ];
+const categories = [
+  {
+    name: "Carte électronique",
+    slug: "carte-electronique",
+    count: "17 produits",
+    icon: Cpu, // Better represents electronic circuit boards/processors
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
+  },
+  {
+    name: "Modules Hydrauliques",
+    slug: "modules-hydrauliques",
+    count: "24 produits",
+    icon: Droplets, // Perfect for hydraulic systems
+    color: "text-cyan-600",
+    bgColor: "bg-cyan-50",
+  },
+  {
+    name: "Pompe",
+    slug: "pompe",
+    count: "19 produits",
+    icon: Waves, // Better represents fluid pumping and water flow
+    color: "text-green-600",
+    bgColor: "bg-green-50",
+  },
+  {
+    name: "Vannes 3 voies",
+    slug: "vannes-3-voies",
+    count: "16 produits",
+    icon: GitBranch, // Visual representation of 3-way flow splitting
+    color: "text-orange-600",
+    bgColor: "bg-orange-50",
+  },
+  {
+    name: "Capteur",
+    slug: "capteur",
+    count: "11 produits",
+    icon: Radar, // Better represents sensors and detection
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
+  },
+  {
+    name: "ÉCHANGEURS",
+    slug: "echangeurs",
+    count: "15 produits",
+    icon: ArrowLeftRight, // Represents heat/energy exchange process
+    color: "text-red-600",
+    bgColor: "bg-red-50",
+  },
+  {
+    name: "Ventilateurs chaudière",
+    slug: "ventilateurs-chaudiere",
+    count: "7 produits",
+    icon: Fan, // Perfect icon for ventilation fans
+    color: "text-indigo-600",
+    bgColor: "bg-indigo-50",
+  },
+  {
+    name: "Soupape chaudière",
+    slug: "soupape-chaudiere",
+    count: "6 produits",
+    icon: ShieldCheck, // Emphasizes safety valve protection
+    color: "text-pink-600",
+    bgColor: "bg-pink-50",
+  },
+];
 
   const handleCategoryClick = (category) => {
     // Navigate to products page with category parameter
