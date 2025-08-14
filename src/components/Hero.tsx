@@ -57,7 +57,7 @@ const Hero = () => {
           <Button 
             size="lg" 
             className="border border-gray-300 text-gray-800 bg-transparent hover:bg-gray-100 transition duration-300 text-lg px-8 py-6"
-            onClick={() => navigate('/contact')}
+            onClick={() => navigate('/contactus')}
           >
             Contacter un expert
           </Button>

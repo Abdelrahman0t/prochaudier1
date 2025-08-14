@@ -10,13 +10,15 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { getTotalItems, openCart } = useCart();
   const location = useLocation(); // ⬅ Current route
+  const navigate = useNavigate();
   const navigation = [
     { name: 'Accueil', href: '/' },
     { name: 'Produits', href: '/products' },
     { name: 'À propos', href: '/Apropos' },
     { name: 'Contact', href: '/contactus' },
     
-  ];
+  ];  
+  const accessToken = localStorage.getItem("access_token");
 
   // 🔍 Shared search component (used in both mobile and desktop)
   const SearchWithDropdown = () => {
@@ -158,16 +160,39 @@ const Header = () => {
           {/* Cart & Mobile Menu */}
 <div className="flex items-center space-x-4">
 
-    {/* Login Button */}
-<Button
-  variant="ghost"
-  size="sm"
-  className="hidden md:flex items-center gap-1 text-sm font-medium hover:text-brand transition-colors max-[992px]:px-2 max-[992px]:text-xs"
-  onClick={() => navigate('/login')}
->
-  <LogIn className="h-5 w-5" />
-  <span className="hidden sm:inline">Se connecter</span>
-</Button>
+  {/* Desktop: Profile or Login */}
+  {accessToken ? (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="hidden md:flex items-center gap-1 text-sm font-medium hover:text-brand transition-colors"
+      onClick={() => navigate('/profile')}
+    >
+      <User className="h-5 w-5" />
+    </Button>
+  ) : (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="hidden md:flex items-center gap-1 text-sm font-medium hover:text-brand transition-colors"
+      onClick={() => navigate('/login')}
+    >
+      <LogIn className="h-5 w-5" />
+      <span className="hidden sm:inline">Se connecter</span>
+    </Button>
+  )}
+
+  {/* Mobile: Profile or Login icon */}
+{accessToken && (
+  <Button
+    variant="ghost"
+    size="sm"
+    className="md:hidden"
+    onClick={() => navigate('/profile')}
+  >
+    <User className="h-5 w-5" />
+  </Button>
+)}
 
 
   {/* Cart */}
@@ -175,9 +200,8 @@ const Header = () => {
     variant="ghost"
     size="sm"
     onClick={openCart}
-    className="relative max-[1400px]:ml-4"
+    className="relative"
   >
-
     <ShoppingCart className="h-5 w-5" />
     {getTotalItems() > 0 && (
       <Badge
@@ -188,8 +212,6 @@ const Header = () => {
       </Badge>
     )}
   </Button>
-
-
 
   {/* Mobile Menu */}
   <Button
@@ -230,18 +252,21 @@ const Header = () => {
     ))}
 
     {/* Mobile Login Button */}
-    <Button
-      variant="outline"
-      size="sm"
-      className="w-full flex items-center gap-2 justify-center"
-      onClick={() => {
-        navigate('/login');
-        setIsMenuOpen(false);
-      }}
-    >
-      <LogIn className="h-4 w-4" />
-      Se connecter
-    </Button>
+{!accessToken && (
+  <Button
+    variant="outline"
+    size="sm"
+    className="w-full flex items-center gap-2 justify-center"
+    onClick={() => {
+      navigate('/login');
+      setIsMenuOpen(false);
+    }}
+  >
+    <LogIn className="h-4 w-4" />
+    Se connecter
+  </Button>
+)}
+
 
     <div className="pt-4 border-t border-border space-y-2 text-sm text-muted-foreground">
       <div className="flex items-center space-x-2">

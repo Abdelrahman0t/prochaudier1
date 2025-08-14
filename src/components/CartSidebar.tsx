@@ -1,9 +1,11 @@
-import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { X, Plus, Minus, ShoppingBag, Router } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/hooks/useCart";
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
 
 const CartSidebar = () => {
   const { 
@@ -19,10 +21,15 @@ const CartSidebar = () => {
   const handleQuantityChange = (id: number, newQuantity: number) => {
     updateQuantity(id, newQuantity);
   };
+  const navigate = useNavigate();
 
-  const formatPrice = (price: number) => {
-    return `${price.toFixed(2)}€`;
-  };
+
+const formatPrice = (price?: number) => {
+  if (typeof price !== "number" || isNaN(price)) {
+    return "0.00€"; // or return "" if you prefer empty
+  }
+  return `${price.toFixed(2)}€`;
+};
 
   return (
     <Sheet open={isOpen} onOpenChange={closeCart}>
@@ -131,7 +138,10 @@ const CartSidebar = () => {
               </div>
 
               <div className="space-y-2">
-                <Button className="w-full" size="lg">
+                <Button className="w-full" size="lg"   onClick={() => {
+    closeCart();
+    navigate('/checkout');
+  }}>
                   Procéder au paiement
                 </Button>
                 <Button 
