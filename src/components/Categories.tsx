@@ -77,6 +77,16 @@ const Categories = () => {
     navigate(`/products?category=${category.slug}`);
   };
 
+
+
+    const handleClick = () => {
+    const isMobile = window.innerWidth < 1024; // lg breakpoint
+    if (isMobile) {
+      navigate('/products?openFilters=true');
+    } else {
+      navigate('/products');
+    }
+  };
   return (
     <section id="categories" className="py-20 bg-gradient-subtle">
       <div className="container mx-auto px-4">
@@ -119,13 +129,13 @@ const Categories = () => {
         </div>
 
         <div className="text-center mt-12">
-          <button 
-            className="inline-flex items-center text-brand font-semibold hover:text-brand-dark transition-colors"
-            onClick={() => navigate('/products')}
-          >
-            Voir toutes les catégories
-            <Wrench className="ml-2 h-4 w-4" />
-          </button>
+    <button
+      className="inline-flex items-center text-brand font-semibold hover:text-brand-dark transition-colors"
+      onClick={handleClick}
+    >
+      Voir toutes les catégories
+      <Wrench className="ml-2 h-4 w-4" />
+    </button>
         </div>
       </div>
     </section>
