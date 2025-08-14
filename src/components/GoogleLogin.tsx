@@ -14,8 +14,7 @@ export default function GoogleLogin({ onLoginSuccess }: GoogleLoginProps) {
         try {
           window.google.accounts.id.initialize({
             client_id:
-              import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-              "556405910731-vn1u2hilr38m4i27m15j5m50q2lcg02g.apps.googleusercontent.com",
+              import.meta.env.VITE_GOOGLE_CLIENT_ID ||,
             callback: handleCredentialResponse,
             auto_select: false,
             cancel_on_tap_outside: true,
@@ -145,3 +144,4 @@ declare global {
     };
   }
 }
+
