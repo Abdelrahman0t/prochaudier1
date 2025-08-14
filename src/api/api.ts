@@ -107,42 +107,71 @@ class ApiClient {
   }
 
   
-   private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    
-    const config: RequestInit = {
-      ...options,
-      headers: options.body instanceof FormData 
-        ? {
-            // For FormData, don't set Content-Type (let browser set it with boundary)
-            ...this.getAuthHeaders(), // Add auth headers
-            ...options.headers,
-          }
-        : {
-            'Content-Type': 'application/json',
-            ...this.getAuthHeaders(), // Add auth headers
-            ...options.headers,
-          }
-    };
+private async request<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  
+  const config: RequestInit = {
+    ...options,
+    headers: options.body instanceof FormData 
+      ? {
+          // For FormData, don't set Content-Type (let browser set it with boundary)
+          ...this.getAuthHeaders(), // Add auth headers
+          ...options.headers,
+        }
+      : {
+          'Content-Type': 'application/json',
+          ...this.getAuthHeaders(), // Add auth headers
+          ...options.headers,
+        }
+  };
 
-    try {
-      const response = await fetch(url, config);
-      
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('API Error Response:', errorData);
-        throw new Error(`HTTP error! status: ${response.status}, details: ${errorData}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error(`API request failed: ${endpoint}`, error);
-      throw error;
+  try {
+    const response = await fetch(url, config);
+    
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('API Error Response:', errorData);
+      throw new Error(`HTTP error! status: ${response.status}, details: ${errorData}`);
     }
+    
+    // Handle DELETE requests - they might return 204 No Content with no body
+    if (options.method === 'DELETE' && (response.status === 204 || response.status === 200)) {
+      return undefined as T; // DELETE returns void, so return undefined
+    }
+    
+    // Check if there's any content to parse
+    const contentLength = response.headers.get('content-length');
+    if (contentLength === '0' || response.status === 204) {
+      return undefined as T;
+    }
+    
+    // Check if response has JSON content
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json();
+    }
+    
+    // For non-JSON responses, try to get text
+    const text = await response.text();
+    if (text) {
+      // If it's not empty, try to parse as JSON, otherwise return as is
+      try {
+        return JSON.parse(text);
+      } catch {
+        return text as T;
+      }
+    }
+    
+    return undefined as T;
+    
+  } catch (error) {
+    console.error(`API request failed: ${endpoint}`, error);
+    throw error;
   }
+}
 
 
     setAuthToken(token: string) {
