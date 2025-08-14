@@ -38,7 +38,7 @@ const ContactUs = () => {
     {
       icon: Mail,
       title: "Email",
-      primary: "contact@prochaudiere.com",
+      primary: "tboody23456@gmail.com",
       secondary: "Réponse sous 2h",
       description: "Support technique disponible",
       color: "text-blue-600",
@@ -48,7 +48,7 @@ const ContactUs = () => {
     {
       icon: MessageCircle,
       title: "WhatsApp",
-      primary: "Chat en direct",
+      primary: "0550 45 24 66",
       secondary: "Réponse immédiate",
       description: "Service client instantané",
       color: "text-emerald-600",
@@ -97,7 +97,21 @@ const ContactUs = () => {
                       <div className="text-sm text-muted-foreground">{method.secondary}</div>
                       <div className="text-sm text-muted-foreground">{method.description}</div>
                     </div>
-                    <Button className="w-full border-2 border-blue-100" variant="outline">
+                    <Button 
+                      className="w-full border-2 border-blue-100" 
+                      variant="outline"
+                      onClick={() => {
+                        if (method.title === "Téléphone") {
+                          window.location.href = `tel:${method.primary.replace(/\s+/g, '')}`;
+                        } else if (method.title === "Email") {
+                          window.location.href = `mailto:${method.primary}`;
+                        } else if (method.title === "WhatsApp") {
+                          // Convert French phone number to international format for WhatsApp
+                          const phoneNumber = method.primary.replace(/\s+/g, '').replace(/^0/, '33');
+                          window.open(`https://wa.me/${phoneNumber}`, '_blank');
+                        }
+                      }}
+                    >
                       <Send className="h-4 w-4 mr-2" />
                       {method.action}
                     </Button>
@@ -155,53 +169,51 @@ const ContactUs = () => {
           </div>
 
           {/* Ticket creation form */}
-{/* Ticket creation form */}
-<Card className="border-0 shadow-lg bg-white max-w-8xl w-full mx-auto">
-  <CardContent className="p-8">
-    <h3 className="font-bold text-2xl mb-6 text-center">Créer un ticket</h3>
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <input
-          type="text"
-          name="firstName"
-          placeholder="Prénom"
-          value={formData.firstName}
-          onChange={handleChange}
-          className="border p-3 rounded-md w-full"
-          required
-        />
-        <input
-          type="text"
-          name="lastName"
-          placeholder="Nom"
-          value={formData.lastName}
-          onChange={handleChange}
-          className="border p-3 rounded-md w-full"
-          required
-        />
-      </div>
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={formData.email}
-        onChange={handleChange}
-        className="border p-3 rounded-md w-full"
-        required
-      />
-      <textarea
-        name="message"
-        placeholder="Votre message"
-        value={formData.message}
-        onChange={handleChange}
-        className="border p-3 rounded-md w-full h-32"
-        required
-      ></textarea>
-      <Button type="submit" className="bg-cyan-600 text-white hover:bg-cyan-700 shadow-lg text-lg px-8 py-6 w-full">Envoyer</Button>
-    </form>
-  </CardContent>
-</Card>
-
+          <Card className="border-0 shadow-lg bg-white max-w-8xl w-full mx-auto">
+            <CardContent className="p-8">
+              <h3 className="font-bold text-2xl mb-6 text-center">Créer un ticket</h3>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="Prénom"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="border p-3 rounded-md w-full"
+                    required
+                  />
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Nom"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="border p-3 rounded-md w-full"
+                    required
+                  />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="border p-3 rounded-md w-full"
+                  required
+                />
+                <textarea
+                  name="message"
+                  placeholder="Votre message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="border p-3 rounded-md w-full h-32"
+                  required
+                ></textarea>
+                <Button type="submit" className="bg-cyan-600 text-white hover:bg-cyan-700 shadow-lg text-lg px-8 py-6 w-full">Envoyer</Button>
+              </form>
+            </CardContent>
+          </Card>
 
           {/* Emergency contact */}
           <div className="mt-12 text-center">
@@ -215,7 +227,6 @@ const ContactUs = () => {
         </div>
       </section>
       <Footer />
-
     </div>
   );
 };

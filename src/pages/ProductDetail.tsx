@@ -340,13 +340,16 @@ const ProductDetail = () => {
               </div>
 
               <div className="flex gap-3">
-                <Button 
-                  onClick={handleAddToCart}
-                  className="flex-1"
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Ajouter au panier
-                </Button>
+<Button 
+  onClick={() => handleAddToCart(product)}
+  size="sm"
+  className="w-full max-[1200px]:text-xs max-[559px]:text-sm max-[559px]:h-8 max-[425px]:text-xs max-[425px]:h-7"
+  disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'}
+>
+  <ShoppingCart className="h-4 w-4 mr-2 max-[1200px]:mr-0 max-[559px]:mr-1.5 max-[425px]:h-3.5 max-[425px]:w-3.5 max-[425px]:mr-1" />
+  {!product.price || product.price === 0 ? "Indisponible" : 
+   product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock' ? "Rupture de stock" : "Ajouter au panier"}
+</Button>
               </div>
             </div>
           </div>
