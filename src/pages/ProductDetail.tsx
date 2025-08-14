@@ -44,7 +44,8 @@ const ProductDetail = () => {
         
         // Fetch related products from the same category
         if (data.categories && data.categories.length > 0) {
-          const categoryParam = data.categories[0]; // Use first category
+          // ✅ FIX: Use category name directly since API now returns strings
+          const categoryParam = data.categories[0]; 
           const relatedResponse = await fetch(
             `${import.meta.env.VITE_API_BASE_URL}/api/products/?categories=${categoryParam}&limit=3`
           );
@@ -54,6 +55,7 @@ const ProductDetail = () => {
             // Filter out current product
             const filtered = relatedData.products.filter(p => p.id !== parseInt(id));
             setRelatedProducts(filtered.slice(0, 3));
+            console.log(filtered.slice(0, 3))
           }
         }
       } catch (err) {
@@ -140,9 +142,40 @@ const ProductDetail = () => {
     );
   }
 
-  const productImage = product.image 
-    ? `${import.meta.env.VITE_API_BASE_URL}${product.image}`
-    : "/placeholder.svg";
+  // ✅ FIX: Build product image gallery from multiple sources
+  const getProductImages = () => {
+    const images = [];
+    
+    // Add main image first if exists
+    if (product.image) {
+      images.push(`${import.meta.env.VITE_API_BASE_URL}${product.image}`);
+    } else if (product.image_url) {
+      images.push(product.image_url);
+    }
+    
+    // Add additional images from ProductImage model
+    if (product.images && product.images.length > 0) {
+      product.images.forEach(img => {
+        let imageUrl = null;
+        if (img.image_url) {
+          imageUrl = img.image_url;
+        } else if (img.image) {
+          imageUrl = `${import.meta.env.VITE_API_BASE_URL}${img.image}`;
+        }
+        
+        // Only add if we have a URL and it's not already in the array
+        if (imageUrl && !images.includes(imageUrl)) {
+          images.push(imageUrl);
+        }
+      });
+    }
+    
+    // Fallback to placeholder if no images
+    return images.length > 0 ? images : ["/placeholder.svg"];
+  };
+
+  const productImages = getProductImages();
+  const currentImage = productImages[selectedImage] || productImages[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -150,32 +183,33 @@ const ProductDetail = () => {
       
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
-<div className="flex items-center gap-2 text-xs sm:text-sm md:text-base text-muted-foreground mb-6">
-  <Button 
-    variant="ghost" 
-    size="sm" 
-    onClick={() => navigate('/products')}
-    className="p-0 h-auto text-xs sm:text-sm md:text-base"
-  >
-    <ArrowLeft className="h-4 w-4 mr-1" />
-    Retour aux produits
-  </Button>
-  <span>/</span>
-  {product.categories && product.categories.length > 0 && (
-    <>
-      <span>{product.categories[0]}</span>
-      <span>/</span>
-    </>
-  )}
-  <span className="text-foreground">{product.title}</span>
-</div>
+        <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base text-muted-foreground mb-6">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate('/products')}
+            className="p-0 h-auto text-xs sm:text-sm md:text-base"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Retour aux produits
+          </Button>
+          <span>/</span>
+          {product.categories && product.categories.length > 0 && (
+            <>
+              {/* ✅ FIX: Categories are now strings, not objects */}
+              <span>{product.categories[0]}</span>
+              <span>/</span>
+            </>
+          )}
+          <span className="text-foreground">{product.title}</span>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images */}
           <div className="space-y-4">
             <div className="aspect-square bg-secondary rounded-lg overflow-hidden">
               <img 
-                src={productImage}
+                src={currentImage}
                 onError={(e) => {
                   e.currentTarget.onerror = null;
                   e.currentTarget.src = "/placeholder.svg";
@@ -184,28 +218,30 @@ const ProductDetail = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* Thumbnail images - you can add multiple images if your API supports them */}
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4].map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`aspect-square bg-secondary rounded-lg overflow-hidden border-2 transition-colors ${
-                    selectedImage === index ? 'border-brand' : 'border-transparent'
-                  }`}
-                >
-                  <img 
-                    src={productImage}
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = "/placeholder.svg";
-                    }}
-                    alt={`${product.title} ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
+            {/* ✅ FIX: Show actual images instead of duplicates */}
+            {productImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {productImages.slice(0, 4).map((imageUrl, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`aspect-square bg-secondary rounded-lg overflow-hidden border-2 transition-colors ${
+                      selectedImage === index ? 'border-brand' : 'border-transparent'
+                    }`}
+                  >
+                    <img 
+                      src={imageUrl}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
+                      alt={`${product.title} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -213,6 +249,7 @@ const ProductDetail = () => {
             <div>
               {product.categories && product.categories.length > 0 && (
                 <Badge variant="secondary" className="mb-2">
+                  {/* ✅ FIX: Categories are now strings */}
                   {product.categories[0]}
                 </Badge>
               )}
@@ -251,12 +288,15 @@ const ProductDetail = () => {
                 </span>
               </div>
               
-              <div className="text-sm font-medium text-success">
-                ✓ En stock - Expédition rapide
-              </div>
+              {product.stock_status?.toLowerCase() === 'outofstock' ? (
+                <span className="text-destructive">✗ Rupture de stock</span>
+              ) : (
+                <span className="text-success">✓ En stock</span>
+              )}
 
               {product.tags && product.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
+                  {/* ✅ FIX: Tags are now strings, not objects */}
                   {product.tags.map((tag, index) => (
                     <Badge key={index} variant="outline">
                       {tag}
@@ -307,7 +347,6 @@ const ProductDetail = () => {
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Ajouter au panier
                 </Button>
-
               </div>
             </div>
           </div>
@@ -347,21 +386,26 @@ const ProductDetail = () => {
                   <div className="flex justify-between py-2 border-b border-border/50">
                     <span className="font-medium">Marques:</span>
                     <span className="text-muted-foreground">
-                      {product.tags?.join(' , ')}
-
+                      {/* ✅ FIX: Tags are now strings, not objects */}
+                      {product.tags?.length > 0 ? product.tags.join(', ') : 'Non spécifié'}
                     </span>
                   </div>
                   {product.categories && product.categories.length > 0 && (
                     <div className="flex justify-between py-2 border-b border-border/50">
                       <span className="font-medium">Catégories:</span>
                       <span className="text-muted-foreground">
+                        {/* ✅ FIX: Categories are now strings, not objects */}
                         {product.categories.join(', ')}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between py-2 border-b border-border/50">
                     <span className="font-medium">Disponibilité:</span>
-                    <span className="text-success">En stock</span>
+                    {product.stock_status === 'outofstock' ? (
+                      <span className="text-destructive">✗ Rupture de stock</span>
+                    ) : (
+                      <span className="text-success">✓ En stock</span>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -375,8 +419,8 @@ const ProductDetail = () => {
             <h2 className="text-2xl font-bold text-foreground mb-6">Produits similaires</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedProducts.map((relatedProduct) => {
-                const relatedProductImage = relatedProduct.image 
-                  ? `${import.meta.env.VITE_API_BASE_URL}${relatedProduct.image}`
+                const relatedProductImage = relatedProduct.main_image 
+                  ? `${import.meta.env.VITE_API_BASE_URL}${relatedProduct.main_image}`
                   : "/placeholder.svg";
 
                 return (
@@ -399,6 +443,7 @@ const ProductDetail = () => {
                       </div>
                       {relatedProduct.categories && relatedProduct.categories.length > 0 && (
                         <Badge variant="secondary" className="text-xs mb-2">
+                          {/* ✅ FIX: Categories in related products are also strings now */}
                           {relatedProduct.categories[0]}
                         </Badge>
                       )}
@@ -411,9 +456,11 @@ const ProductDetail = () => {
                         <span className="text-xl font-bold text-brand">
                           {relatedProduct.price ? `${relatedProduct.price} DZD` : 'Prix non disponible'}
                         </span>
-                        <span className="text-xs text-success">
-                          En stock
-                        </span>
+                        {relatedProduct.stock_status?.toLowerCase() === 'outofstock' ? (
+                          <span className="text-destructive">✗ Rupture de stock</span>
+                        ) : (
+                          <span className="text-success">✓ En stock</span>
+                        )}
                       </div>
                     </CardContent>
                   </Card>

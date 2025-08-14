@@ -399,6 +399,7 @@ const Products = () => {
 
         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products/?${query}`);
         const data = await res.json();
+        console.log(data.products)
         setProducts(data.products);
         setTotalPages(data.total_pages || 1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -474,67 +475,67 @@ const Products = () => {
     }
   };
 
-  const handleAddToCart = async (product) => {
-    if (isAddingToCart) return;
-    setIsAddingToCart(true);
+    const handleAddToCart = async (product) => {
+      if (isAddingToCart) return;
+      setIsAddingToCart(true);
 
-    try {
-      if (!product || !product.id) throw new Error("Invalid product");
+      try {
+        if (!product || !product.id) throw new Error("Invalid product");
 
-      const productPrice = Number(product.price);
-      if (!product.price || productPrice === 0 || isNaN(productPrice)) {
-        toast({
-          title: "Désolé",
-          description: "Ce produit n'est pas disponible à la vente pour le moment.",
-          variant: "destructive",
-          duration: 3000,
-        });
-        return;
-      }
-
-      if (product.stock === 0 || product.in_stock === false) {
-        toast({
-          title: "Désolé",
-          description: "Ce produit est actuellement en rupture de stock.",
-          variant: "destructive",
-          duration: 3000,
-        });
-        return;
-      }
-
-      const imageUrl = product.image
-        ? `${import.meta.env.VITE_API_BASE_URL}${product.image}`
-        : "/placeholder.svg";
-
-      requestAnimationFrame(() => {
-        addToCart({
-          id: product.id,
-          name: product.title || "Produit",
-          price: productPrice,
-          image: imageUrl,
-          quantity: 1
-        });
-
-        setTimeout(() => {
+        const productPrice = Number(product.price);
+        if (!product.price || productPrice === 0 || isNaN(productPrice)) {
           toast({
-            title: "Produit ajouté au panier",
-            description: `${product.title || "Produit"} ajouté au panier.`,
-            duration: 2000,
+            title: "Désolé",
+            description: "Ce produit n'est pas disponible à la vente pour le moment.",
+            variant: "destructive",
+            duration: 3000,
           });
-        }, 100);
-      });
+          return;
+        }
 
-    } catch (error) {
-      console.error("🛑 Failed to add to cart:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'ajouter le produit au panier.",
-        variant: "destructive",
-      });
-    } finally {
-      setTimeout(() => setIsAddingToCart(false), 500);
-    }
-  };
+        if (product.stock === 0 || product.in_stock === false) {
+          toast({
+            title: "Désolé",
+            description: "Ce produit est actuellement en rupture de stock.",
+            variant: "destructive",
+            duration: 3000,
+          });
+          return;
+        }
+
+        const imageUrl = product.main_image
+          ? `${import.meta.env.VITE_API_BASE_URL}${product.main_image}`
+          : "/placeholder.svg";
+
+        requestAnimationFrame(() => {
+          addToCart({
+            id: product.id,
+            name: product.title || "Produit",
+            price: productPrice,
+            image: imageUrl,
+            quantity: 1
+          });
+
+          setTimeout(() => {
+            toast({
+              title: "Produit ajouté au panier",
+              description: `${product.title || "Produit"} ajouté au panier.`,
+              duration: 2000,
+            });
+          }, 100);
+        });
+
+      } catch (error) {
+        console.error("🛑 Failed to add to cart:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible d'ajouter le produit au panier.",
+          variant: "destructive",
+        });
+      } finally {
+        setTimeout(() => setIsAddingToCart(false), 500);
+      }
+    };
 
   // FIXED clearFilters function
   const clearFilters = () => {
@@ -637,34 +638,38 @@ const Products = () => {
   <CardHeader className="p-4 pb-0 max-[559px]:p-3 max-[559px]:pb-0">
     <div className="aspect-[4/3] bg-secondary rounded-lg max-[559px]:rounded-md mb-4 max-[559px]:mb-3 flex items-center justify-center overflow-hidden">
 <img
-  src={`${import.meta.env.VITE_API_BASE_URL}${product.image}`}
+  src={`${import.meta.env.VITE_API_BASE_URL}${product.main_image}`}
   onClick={() => navigate(`/product/${product.id}`)}
   onError={(e) => {
     e.currentTarget.onerror = null;
     e.currentTarget.src = "/product_placeholder.jpg";
   }}
   alt={product.title || "Produit"}
-  className="w-full  object-cover"
+  className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
 />
     </div>
     <div className="space-y-2 max-[559px]:space-y-1.5">
-<CardTitle className="text-lg font-semibold line-clamp-2 max-[425px]:text-xs max-[425px]:font-normal">
-  onClick={() => navigate(`/product/${product.id}`)}
+<CardTitle onClick={() => navigate(`/product/${product.id}`)} className="cursor-pointer text-lg font-semibold line-clamp-2 max-[425px]:text-xs max-[425px]:font-normal hover:text-brand transition-colors">
         {product.title}
       </CardTitle>
+      
+      {/* Display actual description from API */}
       <p className="text-sm text-muted-foreground line-clamp-2 max-[559px]:text-xs">
-        Produit sans description
+        {product.description && product.description.trim() 
+          ? product.description 
+          : "Découvrez ce produit et ses caractéristiques uniques."
+        }
       </p>
 
       {product.tags && product.tags.length > 0 && (
         <div className="flex flex-wrap gap-2 pt-2 max-[559px]:gap-1.5 max-[559px]:pt-1">
-          {product.tags.map((tag: string, index: number) => (
+          {product.tags.map((tag, index) => (
             <Badge
               key={index}
               variant="outline"
               className="text-xs font-medium text-muted-foreground border-muted max-[559px]:text-[10px] max-[559px]:px-1.5 max-[559px]:py-0.5"
             >
-              {tag}
+              {typeof tag === 'object' ? tag.name : tag}
             </Badge>
           ))}
         </div>
@@ -681,7 +686,7 @@ const Products = () => {
           {product.price && product.price !== 0 ? product.price + ' DZD' : 'Prix non disponible'} 
         </p>
         <p className="text-xs font-medium max-[559px]:text-[11px]">
-          {product.stock === 0 || product.in_stock === false ? (
+          {product.stock_status == 'outofstock' ? (
             <span className="text-destructive">✗ Rupture de stock</span>
           ) : (
             <span className="text-success">✓ En stock</span>
@@ -702,11 +707,11 @@ const Products = () => {
   onClick={() => handleAddToCart(product)}
   size="sm"
   className="w-full max-[1200px]:text-xs max-[559px]:text-sm max-[559px]:h-8 max-[425px]:text-xs max-[425px]:h-7"
-  disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false}
+  disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'}
 >
   <ShoppingCart className="h-4 w-4 mr-2 max-[1200px]:mr-0 max-[559px]:mr-1.5 max-[425px]:h-3.5 max-[425px]:w-3.5 max-[425px]:mr-1" />
   {!product.price || product.price === 0 ? "Indisponible" : 
-   product.stock === 0 || product.in_stock === false ? "Rupture de stock" : "Ajouter au panier"}
+   product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock' ? "Rupture de stock" : "Ajouter au panier"}
 </Button>
 
   </CardFooter>
