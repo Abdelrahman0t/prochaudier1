@@ -198,42 +198,30 @@ const ProductModal: React.FC<ProductModalProps> = ({
     ));
   };
 
-  const clearImage = async (position: number) => {
-  const imageToDelete = images.find(img => img.position === position);
-  
-  if (!product || imageToDelete?.file !== null) {
-    // For new products OR if it's a newly uploaded file, just clear locally
-    setImages(prev => prev.map(img => 
-      img.position === position 
-        ? { position, file: null, url: '', preview: '', isFile: false }
-        : img
-    ));
-    return;
-  }
-
-  // For existing products with saved images, call API
-  try {
-    setImageOperationLoading(`delete-${position}`);
-    const updatedProduct = await apiClient.deleteProductImage(product.id, position);
-    loadProductImages(updatedProduct);
-    onProductUpdate?.(updatedProduct);
-  } catch (error) {
-    console.error('Failed to delete image:', error);
-    alert('Failed to delete image. Please try again.');
-  } finally {
-    setImageOperationLoading(null);
-  }
+const clearImage = (position: number) => {
+  // Always clear locally - no API calls
+  // The actual file deletion will happen when user clicks "Update Product"
+  setImages(prev => prev.map(img => 
+    img.position === position 
+      ? { position, file: null, url: '', preview: '', isFile: false }
+      : img
+  ));
 };
 
-  const swapImages = async (pos1: number, pos2: number) => {
+const swapImages = async (pos1: number, pos2: number) => {
   // Check if either position has unsaved changes (local files)
   const img1 = images.find(img => img.position === pos1);
   const img2 = images.find(img => img.position === pos2);
   
   const hasUnsavedChanges = (img1?.file !== null) || (img2?.file !== null);
   
-  if (!product || hasUnsavedChanges) {
-    // For new products OR existing products with unsaved file uploads, swap locally
+  // Check if any image has been cleared (empty preview but product exists)
+  const hasLocalDeletions = product && images.some(img => 
+    !img.file && !img.url && !img.preview
+  );
+  
+  if (!product || hasUnsavedChanges || hasLocalDeletions) {
+    // For new products OR existing products with unsaved changes/deletions, swap locally
     setImages(prev => {
       const newImages = [...prev];
       const img1Index = newImages.findIndex(img => img.position === pos1);
@@ -265,7 +253,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
     return;
   }
 
-  // For existing products with only saved images, call API
+  // For existing products with only saved images and no pending changes, call API
   try {
     setImageOperationLoading(`swap-${pos1}-${pos2}`);
     const updatedProduct = await apiClient.swapProductImages(product.id, pos1, pos2);
@@ -279,7 +267,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
   }
 };
 
-  const moveToMain = async (position: number) => {
+const moveToMain = async (position: number) => {
   if (position === 1) return;
 
   // Check if there's actually an image at the source position
@@ -289,16 +277,19 @@ const ProductModal: React.FC<ProductModalProps> = ({
     return;
   }
 
-  // Check if we have unsaved changes
+  // Check if we have unsaved changes or local deletions
   const hasUnsavedChanges = images.some(img => img.file !== null);
+  const hasLocalDeletions = product && images.some(img => 
+    !img.file && !img.url && !img.preview
+  );
 
-  if (!product || hasUnsavedChanges) {
-    // For new products OR existing products with unsaved changes, swap locally
+  if (!product || hasUnsavedChanges || hasLocalDeletions) {
+    // For new products OR existing products with unsaved changes/deletions, swap locally
     swapImages(1, position);
     return;
   }
 
-  // For existing products with only saved images, call API
+  // For existing products with only saved images and no pending changes, call API
   try {
     setImageOperationLoading(`main-${position}`);
     const updatedProduct = await apiClient.makeProductImageMain(product.id, position);
