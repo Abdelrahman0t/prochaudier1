@@ -180,26 +180,32 @@ const renderCategory = (category: Category, level: number = 0) => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <p className="text-sm font-medium text-gray-600">Total Categories</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">{categories.length}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <p className="text-sm font-medium text-gray-600">Parent Categories</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">{categories.length}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <p className="text-sm font-medium text-gray-600">Subcategories</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">
-            {/* Count all nested children */}
-            {categories.reduce(
-              (count, c) => count + (c.children ? c.children.length : 0),
-              0
-            )}
-          </p>
-        </div>
-      </div>
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+  <div className="bg-white rounded-lg shadow-sm border p-6">
+    <p className="text-sm font-medium text-gray-600">Total Categories</p>
+    <p className="text-2xl font-bold text-gray-900 mt-2">
+      {/* Total = Parent categories + All subcategories */}
+      {categories.length + categories.reduce(
+        (count, c) => count + (c.children ? c.children.length : 0),
+        0
+      )}
+    </p>
+  </div>
+  <div className="bg-white rounded-lg shadow-sm border p-6">
+    <p className="text-sm font-medium text-gray-600">Parent Categories</p>
+    <p className="text-2xl font-bold text-gray-900 mt-2">{categories.length}</p>
+  </div>
+  <div className="bg-white rounded-lg shadow-sm border p-6">
+    <p className="text-sm font-medium text-gray-600">Subcategories</p>
+    <p className="text-2xl font-bold text-gray-900 mt-2">
+      {/* Count all nested children */}
+      {categories.reduce(
+        (count, c) => count + (c.children ? c.children.length : 0),
+        0
+      )}
+    </p>
+  </div>
+</div>
 
       {/* Categories Tree */}
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
