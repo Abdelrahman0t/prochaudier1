@@ -307,7 +307,7 @@ private async request<T>(
   }
 
   async createCategory(categoryData: Partial<Category>): Promise<Category> {
-    return this.request<Category>('/admin/categories2/', {
+    return this.request<Category>('/admin/categories/', {
       method: 'POST',
       body: JSON.stringify(categoryData),
     });
@@ -426,3 +426,4 @@ export const formatPriceForFilter = (price: number | string): string => {
   }
   return price;
 };
+
