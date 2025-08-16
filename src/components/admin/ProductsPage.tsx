@@ -27,16 +27,17 @@ const ProductsPage: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [productsData, categoriesData, tagsData] = await Promise.all([
-        apiClient.getProducts(),
-        apiClient.getCategories2(),
-        apiClient.getTags()
-      ]);
-      
-      setProducts(productsData);
-      console.log(productsData)
-      setCategories(categoriesData);
-      setTags(tagsData);
+const [productsData, categoriesData, tagsResponse] = await Promise.all([
+  apiClient.getProducts(),
+  apiClient.getCategories2(),
+  apiClient.getTags()
+]);
+
+setProducts(productsData);
+console.log(productsData)
+setCategories(categoriesData);
+// Extract tags array from the response object
+setTags(Array.isArray(tagsResponse) ? tagsResponse : tagsResponse.tags || []);
       setError(null);
     } catch (err) {
       console.error('Failed to fetch data:', err);
