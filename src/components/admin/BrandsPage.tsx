@@ -11,13 +11,15 @@ const BrandsPage: React.FC = () => {
   const [editingBrand, setEditingBrand] = useState<Tag | null>(null); // Changed Brand to Tag
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+const [totalProducts, setTotalProducts] = useState(0);
   // Fetch brands from API
   const fetchBrands = async () => {
     try {
       setLoading(true);
       const data = await apiClient.getTags();
-      setBrands(data);
+      console.log("Tags API data:", data.tags);
+      setBrands(data.tags);
+      setTotalProducts(data.total_products);
       setError(null);
     } catch (err) {
       console.error(err);
@@ -118,14 +120,13 @@ const BrandsPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <p className="text-sm font-medium text-gray-600">Active Brands</p>
           <p className="text-2xl font-bold text-gray-900 mt-2">
-            {brands.filter(b => (b.count || 0) > 0).length}
+            {brands.length}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <p className="text-sm font-medium text-gray-600">Total Products</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">
-            {brands.reduce((sum, brand) => sum + (brand.count || 0), 0)}
-          </p>
+  <p className="text-2xl font-bold text-gray-900 mt-2">{totalProducts}</p>
+
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <p className="text-sm font-medium text-gray-600">Avg Products/Brand</p>
