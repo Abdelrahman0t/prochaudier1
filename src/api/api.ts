@@ -15,12 +15,15 @@ export interface Tag {
   id: number;
   name: string;
   slug: string;
+  image?: string | null;
+  image_url?: string | null;
   count?: number;
 }
 
 export interface Product {
   id: number;
   title: string;
+  short_description: string;  // NEW FIELD
   description: string;
   date: string;
   price: number | string;
@@ -338,23 +341,27 @@ private async request<T>(
   }
 
   // Tags API
-  async getTags(): Promise<Tag[]> {
-    return this.request<Tag[]>('/admin/tags/');
-  }
+async getTags(): Promise<{ tags: Tag[]; total_products: number }> {
+  return this.request<{ tags: Tag[]; total_products: number }>('/admin/tags/');
+}
 
-  async createTag(tagData: Partial<Tag>): Promise<Tag> {
-    return this.request<Tag>('/admin/tags/', {
-      method: 'POST',
-      body: JSON.stringify(tagData),
-    });
-  }
+async createTag(tagData: FormData | { name: string; slug: string; image?: File }): Promise<Tag> {
+  const body = tagData instanceof FormData ? tagData : JSON.stringify(tagData);
+  
+  return this.request<Tag>('/admin/tags/', {
+    method: 'POST',
+    body,
+  });
+}
 
-  async updateTag(id: number, tagData: Partial<Tag>): Promise<Tag> {
-    return this.request<Tag>(`/admin/tags/${id}/`, {
-      method: 'PUT',
-      body: JSON.stringify(tagData),
-    });
-  }
+async updateTag(id: number, tagData: FormData | { name: string; slug: string; image?: File; remove_image?: string }): Promise<Tag> {
+  const body = tagData instanceof FormData ? tagData : JSON.stringify(tagData);
+  
+  return this.request<Tag>(`/admin/tags/${id}/`, {
+    method: 'PUT',
+    body,
+  });
+}
 
   async deleteTag(id: number): Promise<void> {
     return this.request<void>(`/admin/tags/${id}/`, {
@@ -426,4 +433,3 @@ export const formatPriceForFilter = (price: number | string): string => {
   }
   return price;
 };
-

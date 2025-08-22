@@ -482,8 +482,8 @@ const ProductDetail = () => {
                   </span>
                 </div>
               </div>
-              <p className="text-muted-foreground text-lg">
-                {product.description || "Description du produit non disponible."}
+              <p className="text-muted-foreground text-lg whitespace-pre-line">
+                {product.short_description || "Description du produit non disponible."}
               </p>
             </div>
 
@@ -576,7 +576,7 @@ const ProductDetail = () => {
                 <CardTitle>Description détaillée</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                   {product.description || product.title || "Description détaillée non disponible pour ce produit."}
                 </p>
               </CardContent>
