@@ -1,5 +1,5 @@
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from 'lucide-react';
-import { FaTiktok } from 'react-icons/fa';
+import { FaTiktok, FaLinkedin } from 'react-icons/fa';
 const Footer = () => {
   const quickLinks = [
     { name: 'Accueil', href: '/' },
@@ -36,7 +36,9 @@ const Footer = () => {
     { name: 'Facebook', icon: Facebook, href: 'https://www.facebook.com/facofrisav?mibextid=wwXIfr&rdid=UsnyEiSTMN3T7wn7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2FPZRqibTLvZvnEyqC%2F%3Fmibextid%3DwwXIfr#' },
     { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/prochaudiere/' },
     { name: 'tiktok', icon: FaTiktok, href: 'https://www.tiktok.com/@prochaudiere?_t=8sdG4jikYFh&_r=1' },
-    { name: 'YouTube', icon: Youtube, href: '#' },
+    //{ name: 'YouTube', icon: Youtube, href: '#' },
+    { name: 'Linkedin', icon: FaLinkedin, href: 'https://linkedin.com/in/mohamed-ait-ouarabi-054a05a2' },
+
   ];
 
   return (

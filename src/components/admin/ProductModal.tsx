@@ -9,7 +9,7 @@ interface ProductModalProps {
   onSave: (product: any) => void;
   onClose: () => void;
   isLoading?: boolean;
-  onProductUpdate?: (product: Product) => void; // Add callback for product updates
+  onProductUpdate?: (product: Product) => void;
 }
 
 interface ImageSlot {
@@ -31,6 +31,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
 }) => {
   const [formData, setFormData] = useState({
     title: '',
+    short_description: '', // Added short_description
     description: '',
     price: '',
     stock_status: 'instock' as 'instock' | 'outofstock',
@@ -56,6 +57,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
     if (product) {
       setFormData({
         title: product.title,
+        short_description: (product as any).short_description || '', // Use type assertion to access short_description
         description: product.description || '',
         price: product.price.toString(),
         stock_status: product.stock_status,
@@ -68,6 +70,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
     } else {
       setFormData({
         title: '',
+        short_description: '', // Reset short_description
         description: '',
         price: '',
         stock_status: 'instock',
@@ -131,8 +134,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
     try {
       const formDataToSend = new FormData();
       
-      // Add basic fields
+      // Add basic fields (including short_description)
       formDataToSend.append('title', formData.title.trim());
+      formDataToSend.append('short_description', formData.short_description.trim()); // Add short_description
       formDataToSend.append('description', formData.description);
       formDataToSend.append('price', formData.price);
       formDataToSend.append('stock_status', formData.stock_status);
@@ -453,13 +457,6 @@ const moveToMain = async (position: number) => {
     return renderCategories(hierarchicalCategories);
   };
 
-  const sampleImages = [
-    'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg',
-    'https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg',
-    'https://images.pexels.com/photos/279906/pexels-photo-279906.jpeg',
-    'https://images.pexels.com/photos/325876/pexels-photo-325876.jpeg'
-  ];
-
 return (
   <div style={{ marginTop: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-7xl max-h-[95vh] overflow-hidden flex flex-col">
@@ -520,9 +517,31 @@ return (
                       )}
                     </div>
 
+                    {/* Short Description Field */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Description
+                        Short Description
+                      </label>
+                      <textarea
+                        name="short_description"
+                        value={formData.short_description}
+                        onChange={handleInputChange}
+                        rows={2}
+                        maxLength={200}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none hover:border-gray-300 transition-colors"
+                        placeholder="Brief product summary (max 200 characters)"
+                      />
+                      <div className="flex justify-between items-center mt-1">
+                        <p className="text-xs text-gray-500">Perfect for product listings and previews</p>
+                        <span className="text-xs text-gray-400">
+                          {formData.short_description.length}/200
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Full Description
                       </label>
                       <textarea
                         name="description"

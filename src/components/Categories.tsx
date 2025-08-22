@@ -74,13 +74,11 @@ const categories = [
 ];
 
   const handleCategoryClick = (category) => {
-    // Navigate to products page with category parameter
-    navigate(`/products?category=${category.slug}`);
+    // Navigate to products page with categories parameter (plural)
+    navigate(`/products?categories=${category.slug}`);
   };
 
-
-
-    const handleClick = () => {
+  const handleClick = () => {
     const isMobile = window.innerWidth < 1024; // lg breakpoint
     if (isMobile) {
       navigate('/products?openFilters=true');
@@ -88,6 +86,7 @@ const categories = [
       navigate('/products');
     }
   };
+  
   return (
     <section id="categories" className="py-20 bg-gradient-subtle">
       <div className="container mx-auto px-4">
@@ -130,13 +129,13 @@ const categories = [
         </div>
 
         <div className="text-center mt-12">
-    <button
-      className="inline-flex items-center text-brand font-semibold hover:text-brand-dark transition-colors"
-      onClick={handleClick}
-    >
-      Voir toutes les catégories
-      <Wrench className="ml-2 h-4 w-4" />
-    </button>
+          <button
+            className="inline-flex items-center text-brand font-semibold hover:text-brand-dark transition-colors"
+            onClick={() => navigate('/categorypage')}
+          >
+            Voir toutes les catégories
+            <Wrench className="ml-2 h-4 w-4" />
+          </button>
         </div>
       </div>
     </section>

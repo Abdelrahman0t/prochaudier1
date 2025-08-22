@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { 
   LayoutDashboard, 
   ShoppingBag, 
@@ -20,6 +22,7 @@ interface AdminLayoutProps {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage, onPageChange }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   const menuItems = [
    // { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -86,7 +89,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage, onPage
         <div className="absolute bottom-4 left-4 right-4">
           <button className="w-full flex items-center space-x-3 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
             <LogOut className="w-5 h-5" />
-            <span className="font-medium">Logout</span>
+            <span onClick={() => navigate('/profile')} className="font-medium">Profile</span>
           </button>
         </div>
       </aside>

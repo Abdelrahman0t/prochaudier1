@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tag } from '../../types/admin'; // Changed from Brand to Tag
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Image } from 'lucide-react';
 import BrandModal from './BrandModal';
 import { apiClient } from '../../api/api';
 
@@ -11,7 +11,8 @@ const BrandsPage: React.FC = () => {
   const [editingBrand, setEditingBrand] = useState<Tag | null>(null); // Changed Brand to Tag
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-const [totalProducts, setTotalProducts] = useState(0);
+  const [totalProducts, setTotalProducts] = useState(0);
+
   // Fetch brands from API
   const fetchBrands = async () => {
     try {
@@ -47,19 +48,27 @@ const [totalProducts, setTotalProducts] = useState(0);
     setIsModalOpen(true);
   };
 
-  // Fixed: Now properly creates Tag data structure
-  const handleSaveBrand = async (brandData: { name: string; slug?: string }) => {
+  // Updated to handle FormData for image uploads
+  const handleSaveBrand = async (brandData: { name: string; slug?: string; image?: File | null; removeImage?: boolean }) => {
     try {
+      const formData = new FormData();
+      
       // Generate slug from name if not provided
-      const tagData = {
-        name: brandData.name,
-        slug: brandData.slug || brandData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-      };
+      const slug = brandData.slug || brandData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      
+      formData.append('name', brandData.name);
+      formData.append('slug', slug);
+      
+      if (brandData.removeImage) {
+        formData.append('remove_image', 'true');
+      } else if (brandData.image) {
+        formData.append('image', brandData.image);
+      }
 
       if (editingBrand) {
-        await apiClient.updateTag(editingBrand.id, tagData);
+        await apiClient.updateTag(editingBrand.id, formData);
       } else {
-        await apiClient.createTag(tagData);
+        await apiClient.createTag(formData);
       }
       fetchBrands();
       setIsModalOpen(false);
@@ -125,8 +134,7 @@ const [totalProducts, setTotalProducts] = useState(0);
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <p className="text-sm font-medium text-gray-600">Total Products</p>
-  <p className="text-2xl font-bold text-gray-900 mt-2">{totalProducts}</p>
-
+          <p className="text-2xl font-bold text-gray-900 mt-2">{totalProducts}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <p className="text-sm font-medium text-gray-600">Avg Products/Brand</p>
@@ -156,14 +164,34 @@ const [totalProducts, setTotalProducts] = useState(0);
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                      <span className="text-gray-400 font-medium text-lg">
-                        {brand.name.charAt(0).toUpperCase()}
+                      {brand.image_url ? (
+                        <img 
+                          src={brand.image_url} 
+                          alt={brand.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <span 
+                        className="text-gray-400 font-medium text-lg flex items-center justify-center w-full h-full"
+                        style={{ display: brand.image_url ? 'none' : 'flex' }}
+                      >
+                        {brand.image_url ? <Image className="w-6 h-6" /> : brand.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">{brand.name}</h3>
                       <p className="text-gray-600">{brand.count || 0} products</p>
                       <p className="text-sm text-gray-500">Slug: {brand.slug}</p>
+                      {brand.image_url && (
+                        <p className="text-xs text-green-600 flex items-center gap-1">
+                          <Image className="w-3 h-3" />
+                          Has image
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">

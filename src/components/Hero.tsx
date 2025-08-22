@@ -36,13 +36,11 @@ const Hero = () => {
       {/* Content */}
       <div className="text-center lg:text-left animate-fade-in">
   <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-    Pièces détachées pour 
-    <span className="text-cyan-600 inline"> chaudières</span>
-   <span className="block">de toutes marques</span>
+   Pièces détachées pour <span className="text-cyan-600 inline">chaudières</span> toutes marques
+
   </h1>
   <p className="text-xl text-gray-700 mb-8 leading-relaxed max-w-xl md:mx-auto lg:mx-0">
-    Commandez facilement des pièces originales pour votre chaudière. 
-    Livraison rapide, qualité garantie et service client professionnel.
+    Pièces originales, livraison rapide partout en Algérie. Qualité certifiée et assistance technique experte.
   </p>
 
 <div className="flex flex-col sm:flex-row gap-4 mb-12 justify-center md:items-center md:justify-center lg:justify-start lg:items-start text-center md:text-center lg:text-left">
@@ -54,13 +52,14 @@ const Hero = () => {
             Parcourir les produits
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-          <Button 
-            size="lg" 
-            className="border border-gray-300 text-gray-800 bg-transparent hover:bg-gray-100 transition duration-300 text-lg px-8 py-6"
-            onClick={() => navigate('/contactus')}
-          >
-            Contacter un expert
-          </Button>
+<Button 
+  size="lg" 
+  className="border border-gray-300 text-gray-800 bg-transparent hover:bg-gray-100 transition duration-300 text-lg px-8 py-6"
+  onClick={() => navigate('/allbrands')}
+>
+  Voir toutes nos marques
+</Button>
+
         </div>
 
         {/* Trust indicators */}

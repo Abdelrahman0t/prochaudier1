@@ -108,7 +108,7 @@ const FeaturedProducts = () => {
               key={brand.id}
               className="group cursor-pointer border-0 shadow-md hover:shadow-xl transition-all duration-300 hover-lift overflow-hidden"
               style={{ animationDelay: `${index * 0.1}s` }}
-              onClick={() => navigate(`/products?brand=${brand.slug}`)}
+              onClick={() => navigate(`/products?tags=${brand.name}`)}
             >
               <div className="relative overflow-hidden p-4">
                 <img
@@ -143,7 +143,7 @@ const FeaturedProducts = () => {
                     className="h-8 w-8 p-0"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/products?brand=${brand.slug}`);
+                      navigate(`/products?tags=${brand.name}`);
                     }}
                   >
                     <Eye className="h-4 w-4" />
@@ -183,7 +183,7 @@ const FeaturedProducts = () => {
                   variant="outline" 
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/products?brand=${brand.slug}`);
+                    navigate(`/products?tags=${brand.name}&openFilters=true`);
                   }}
                 >
                   Voir les produits
@@ -198,7 +198,7 @@ const FeaturedProducts = () => {
             variant="outline" 
             size="lg" 
             className="bg-cyan-600 text-white hover:bg-cyan-700 hover:text-white shadow-lg text-lg px-8 py-6"
-            onClick={() => navigate('/products')}
+            onClick={() => navigate('/allbrands')}
           >
             Voir toutes les marques
           </Button>
