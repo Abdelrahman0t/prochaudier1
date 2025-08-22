@@ -25,6 +25,7 @@ const BrandModal: React.FC<BrandModalProps> = ({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isNewImage, setIsNewImage] = useState(false); // Track if it's a newly uploaded image
   const [removeImage, setRemoveImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,6 +37,7 @@ const BrandModal: React.FC<BrandModalProps> = ({
       });
       setImagePreview(brand.image_url || null);
       setSelectedImage(null);
+      setIsNewImage(false);
       setRemoveImage(false);
     } else {
       setFormData({
@@ -44,6 +46,7 @@ const BrandModal: React.FC<BrandModalProps> = ({
       });
       setImagePreview(null);
       setSelectedImage(null);
+      setIsNewImage(false);
       setRemoveImage(false);
     }
     setErrors({});
@@ -101,6 +104,7 @@ const BrandModal: React.FC<BrandModalProps> = ({
       
       setSelectedImage(file);
       setRemoveImage(false);
+      setIsNewImage(true); // Mark as new image
       
       // Create preview
       const reader = new FileReader();
@@ -121,6 +125,7 @@ const BrandModal: React.FC<BrandModalProps> = ({
   const handleRemoveImage = () => {
     setSelectedImage(null);
     setImagePreview(null);
+    setIsNewImage(false);
     setRemoveImage(true);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -166,6 +171,17 @@ const BrandModal: React.FC<BrandModalProps> = ({
     if (errors.slug) {
       setErrors(prev => ({ ...prev, slug: '' }));
     }
+  };
+
+  // Helper function to get the correct image URL
+  const getImageUrl = (preview: string | null) => {
+    if (!preview) return null;
+    // If it's a new image, it will be a base64 data URL, use it directly
+    if (isNewImage || preview.startsWith('data:')) {
+      return preview;
+    }
+    // If it's an existing image from the server, prepend the API base URL
+    return import.meta.env.VITE_API_BASE_URL + preview;
   };
 
   return (
@@ -236,7 +252,7 @@ const BrandModal: React.FC<BrandModalProps> = ({
                 <div className="mb-4">
                   <div className="relative inline-block">
                     <img 
-                      src={import.meta.env.VITE_API_BASE_URL + imagePreview} 
+                      src={getImageUrl(imagePreview)} 
                       alt="Preview"
                       className="w-24 h-24 object-cover rounded-lg border border-gray-200"
                     />
@@ -284,7 +300,7 @@ const BrandModal: React.FC<BrandModalProps> = ({
                   <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                     {imagePreview && !removeImage ? (
                       <img 
-                        src={import.meta.env.VITE_API_BASE_URL + imagePreview} 
+                        src={getImageUrl(imagePreview)} 
                         alt="Preview"
                         className="w-full h-full object-cover"
                       />
