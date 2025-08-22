@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, ShoppingCart, ChevronRight, Home, Package } from 'lucide-react';
+import { Eye, ShoppingCart, ChevronRight, Home, Package, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,103 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ChevronLeft, ChevronsLeft, ChevronsRight } from "lucide-react";
+
+// Full Page Loading Component - Shows on initial load
+const LoadingPage = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20 2xl:px-24 w-full mx-auto pt-6 sm:pt-12">
+        {/* Loading Header */}
+        <div className="flex justify-center items-center mb-8 sm:mb-12">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative">
+              <Loader2 className="h-8 w-8 animate-spin text-brand" />
+              <div className="absolute inset-0 rounded-full border-2 border-brand/20 animate-pulse"></div>
+            </div>
+            <div className="text-center space-y-2">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground">
+                Chargement des produits...
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Veuillez patienter pendant que nous préparons votre catalogue
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Loading Grid Skeleton */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <Card key={index} className="flex flex-col h-full">
+              <CardHeader className="p-2 sm:p-3 md:p-4 pb-0">
+                {/* Image Skeleton */}
+                <div className="aspect-[4/3] bg-gray-200 rounded-md sm:rounded-lg mb-2 sm:mb-3 md:mb-4 animate-pulse">
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Package className="h-8 w-8 text-gray-400" />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  {/* Title Skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                  </div>
+                  
+                  {/* Description Skeleton - Hidden on mobile */}
+                  <div className="hidden sm:block space-y-1">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse"></div>
+                  </div>
+                  
+                  {/* Tags Skeleton */}
+                  <div className="flex gap-1 sm:gap-2 pt-2">
+                    <div className="h-5 w-12 bg-gray-200 rounded-full animate-pulse"></div>
+                    <div className="h-5 w-16 bg-gray-200 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="p-2 sm:p-3 md:p-4 flex-grow" />
+
+              <CardFooter className="p-2 sm:p-3 md:p-4 pt-0 flex-col gap-2 sm:gap-3 mt-auto">
+                <div className="flex justify-between items-end w-full">
+                  <div className="space-y-1">
+                    {/* Price Skeleton */}
+                    <div className="h-6 w-20 bg-gray-200 rounded animate-pulse"></div>
+                    {/* Stock Status Skeleton */}
+                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                  {/* View Button Skeleton */}
+                  <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                
+                {/* Add to Cart Button Skeleton */}
+                <div className="w-full h-8 bg-gray-200 rounded animate-pulse"></div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+};
+
+// Mini Loading Component for product updates
+const ProductsLoadingState = () => {
+  return (
+    <div className="flex justify-center items-center py-12">
+      <div className="flex flex-col items-center space-y-3">
+        <Loader2 className="h-6 w-6 animate-spin text-brand" />
+        <p className="text-muted-foreground text-sm">Mise à jour des produits...</p>
+      </div>
+    </div>
+  );
+};
 
 // FilterDisplay component - shows breadcrumb
 const FilterDisplay = ({ selectedCategories, selectedTags, categories, onShowAllProducts }) => {
@@ -153,8 +250,9 @@ const Bread = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   
-  // NEW: Combined loading states
+  // Enhanced loading states
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
 
   // Load categories AND initialize filters from URL in one effect
   useEffect(() => {
@@ -198,6 +296,7 @@ const Bread = () => {
     if (!isInitialized) return;
 
     const fetchProducts = async () => {
+      setIsLoadingProducts(true);
       try {
         const query = new URLSearchParams();
         query.append("page", currentPage.toString());
@@ -221,6 +320,8 @@ const Bread = () => {
         }
       } catch (err) {
         console.error("❌ Error fetching products", err);
+      } finally {
+        setIsLoadingProducts(false);
       }
     };
 
@@ -296,6 +397,11 @@ const Bread = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+  // Show full loading page on initial load
+  if (!isInitialized) {
+    return <LoadingPage />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -316,127 +422,134 @@ const Bread = () => {
             />
           )}
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
-            {products.map((product) => (
-              <Card
-                key={product.id}
-                className="flex flex-col h-full group hover:shadow-lg transition-all duration-300"
-              >
-                <CardHeader className="p-2 sm:p-3 md:p-4 pb-0">
-                  <div className="aspect-[4/3] bg-secondary rounded-md sm:rounded-lg mb-2 sm:mb-3 md:mb-4 flex items-center justify-center overflow-hidden">
-                    <img
-                      src={`${import.meta.env.VITE_API_BASE_URL}${product.main_image}`}
-                      onClick={() => navigate(`/product/${product.id}`)}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = "/product_placeholder.jpg";
-                      }}
-                      alt={product.title || "Produit"}
-                      className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="space-y-1 sm:space-y-1.5 md:space-y-2">
-                    <CardTitle 
-                      onClick={() => navigate(`/product/${product.id}`)} 
-                      className="cursor-pointer text-sm sm:text-base md:text-lg font-semibold line-clamp-2 hover:text-brand transition-colors"
-                    >
-                      {product.title}
-                    </CardTitle>
-                    
-                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 hidden sm:block">
-                      {product.short_description && product.short_description.trim() 
-                        ? product.short_description 
-                        : "Découvrez ce produit et ses caractéristiques uniques."
-                      }
-                    </p>
+          {/* Show mini loading state when fetching products */}
+          {isLoadingProducts ? (
+            <ProductsLoadingState />
+          ) : (
+            <>
+              {/* Products Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
+                {products.map((product) => (
+                  <Card
+                    key={product.id}
+                    className="flex flex-col h-full group hover:shadow-lg transition-all duration-300"
+                  >
+                    <CardHeader className="p-2 sm:p-3 md:p-4 pb-0">
+                      <div className="aspect-[4/3] bg-secondary rounded-md sm:rounded-lg mb-2 sm:mb-3 md:mb-4 flex items-center justify-center overflow-hidden">
+                        <img
+                          src={`${import.meta.env.VITE_API_BASE_URL}${product.main_image}`}
+                          onClick={() => navigate(`/product/${product.id}`)}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/product_placeholder.jpg";
+                          }}
+                          alt={product.title || "Produit"}
+                          className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="space-y-1 sm:space-y-1.5 md:space-y-2">
+                        <CardTitle 
+                          onClick={() => navigate(`/product/${product.id}`)} 
+                          className="cursor-pointer text-sm sm:text-base md:text-lg font-semibold line-clamp-2 hover:text-brand transition-colors"
+                        >
+                          {product.title}
+                        </CardTitle>
+                        
+                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 hidden sm:block">
+                          {product.short_description && product.short_description.trim() 
+                            ? product.short_description 
+                            : "Découvrez ce produit et ses caractéristiques uniques."
+                          }
+                        </p>
 
-                    {product.tags && product.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 pt-1 sm:pt-1.5 md:pt-2">
-                        {product.tags.slice(0, 2).map((tag, index) => (
-                          <Badge
-                            key={index}
-                            variant="outline"
-                            className="text-[10px] sm:text-xs font-medium text-muted-foreground border-muted px-1 sm:px-1.5 py-0.5"
-                          >
-                            {typeof tag === 'object' ? tag.name : tag}
-                          </Badge>
-                        ))}
-                        {product.tags.length > 2 && (
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] sm:text-xs font-medium text-muted-foreground border-muted px-1 sm:px-1.5 py-0.5"
-                          >
-                            +{product.tags.length - 2}
-                          </Badge>
+                        {product.tags && product.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 pt-1 sm:pt-1.5 md:pt-2">
+                            {product.tags.slice(0, 2).map((tag, index) => (
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-[10px] sm:text-xs font-medium text-muted-foreground border-muted px-1 sm:px-1.5 py-0.5"
+                              >
+                                {typeof tag === 'object' ? tag.name : tag}
+                              </Badge>
+                            ))}
+                            {product.tags.length > 2 && (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] sm:text-xs font-medium text-muted-foreground border-muted px-1 sm:px-1.5 py-0.5"
+                              >
+                                +{product.tags.length - 2}
+                              </Badge>
+                            )}
+                          </div>
                         )}
                       </div>
-                    )}
-                  </div>
-                </CardHeader> 
+                    </CardHeader> 
 
-                <CardContent className="p-2 sm:p-3 md:p-4 flex-grow" />
+                    <CardContent className="p-2 sm:p-3 md:p-4 flex-grow" />
 
-                <CardFooter className="p-2 sm:p-3 md:p-4 pt-0 flex-col gap-2 sm:gap-3 mt-auto">
-                  <div className="flex justify-between items-end w-full">
-                    <div className="space-y-0.5 sm:space-y-1">
-                      <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-brand">
-                        {product.price && product.price !== 0 ? product.price + ' DZD' : 'Prix non disponible'} 
-                      </p>
-                      <p className="text-[10px] sm:text-xs font-medium">
-                        {product.stock_status == 'outofstock' ? (
-                          <span className="text-destructive">✗ Rupture de stock</span>
-                        ) : (
-                          <span className="text-success">✓ En stock</span>
-                        )}
+                    <CardFooter className="p-2 sm:p-3 md:p-4 pt-0 flex-col gap-2 sm:gap-3 mt-auto">
+                      <div className="flex justify-between items-end w-full">
+                        <div className="space-y-0.5 sm:space-y-1">
+                          <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-brand">
+                            {product.price && product.price !== 0 ? product.price + ' DZD' : 'Prix non disponible'} 
+                          </p>
+                          <p className="text-[10px] sm:text-xs font-medium">
+                            {product.stock_status == 'outofstock' ? (
+                              <span className="text-destructive">✗ Rupture de stock</span>
+                            ) : (
+                              <span className="text-success">✓ En stock</span>
+                            )}
+                          </p>
+                        </div>
+                        <Button 
+                          onClick={() => navigate(`/product/${product.id}`)}
+                          variant="ghost"
+                          size="icon"
+                          className="text-black border border-gray-300 bg-gray-50 hover:bg-gray-100 h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9"
+                        >
+                          <Eye className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                        </Button>
+                      </div>
+
+                      <Button 
+                        onClick={() => handleAddToCart(product)}
+                        size="sm"
+                        className="w-full text-xs sm:text-sm h-7 sm:h-8 md:h-9"
+                        disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'}
+                      >
+                        <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="truncate">
+                          {!product.price || product.price === 0 ? "Indisponible" : 
+                           product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock' ? "Rupture de stock" : "Ajouter au panier"}
+                        </span>
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Enhanced No products message */}
+              {products.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="flex flex-col items-center space-y-4">
+                    <Package className="h-12 w-12 text-muted-foreground/50" />
+                    <div className="space-y-2">
+                      <p className="text-muted-foreground text-lg font-medium">Aucun produit trouvé</p>
+                      <p className="text-sm text-muted-foreground">
+                        Essayez de modifier vos filtres ou explorez d'autres catégories
                       </p>
                     </div>
-                    <Button 
-                      onClick={() => navigate(`/product/${product.id}`)}
-                      variant="ghost"
-                      size="icon"
-                      className="text-black border border-gray-300 bg-gray-50 hover:bg-gray-100 h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9"
-                    >
-                      <Eye className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-                    </Button>
                   </div>
-
-                  <Button 
-                    onClick={() => handleAddToCart(product)}
-                    size="sm"
-                    className="w-full text-xs sm:text-sm h-7 sm:h-8 md:h-9"
-                    disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'}
-                  >
-                    <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                    <span className="truncate">
-                      {!product.price || product.price === 0 ? "Indisponible" : 
-                       product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock' ? "Rupture de stock" : "Ajouter au panier"}
-                    </span>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-
-          {/* No products message */}
-          {products.length === 0 && isInitialized && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">Aucun produit trouvé avec ces filtres.</p>
-
-            </div>
-          )}
-
-          {/* Loading state */}
-          {!isInitialized && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">Chargement des produits...</p>
-            </div>
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>
 
-      {/* Pagination */}
-      {products.length > 0 && totalPages > 1 && (
+      {/* Pagination - Only show when not loading */}
+      {products.length > 0 && totalPages > 1 && !isLoadingProducts && (
         <div className="flex justify-center items-center mt-8 gap-2 pb-16">
           {/* First Page Button */}
           <Button
@@ -513,3 +626,4 @@ const Bread = () => {
 };
 
 export default Bread;
+
