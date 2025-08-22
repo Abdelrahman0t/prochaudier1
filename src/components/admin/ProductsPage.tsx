@@ -49,7 +49,7 @@ setTags(Array.isArray(tagsResponse) ? tagsResponse : tagsResponse.tags || []);
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
+                         (product.short_description && product.short_description.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = categoryFilter === 'all' || 
       product.categories.some(cat => cat.id.toString() === categoryFilter);
     const matchesTag = tagFilter === 'all' || 
@@ -197,9 +197,9 @@ const ProductCard = ({ product }: { product: Product }) => (
         <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-1 leading-tight line-clamp-2">
           {product.title}
         </h3>
-        {product.description && (
+        {product.short_description && (
           <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
-            {product.description}
+            {product.short_description}
           </p>
         )}
       </div>
@@ -261,8 +261,8 @@ const ProductCard = ({ product }: { product: Product }) => (
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.title}</h3>
-              {product.description && (
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
+              {product.short_description && (
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.short_description}</p>
               )}
               <div className="flex flex-wrap gap-1 sm:gap-2 mb-3">
                 {product.categories.map(category => (
