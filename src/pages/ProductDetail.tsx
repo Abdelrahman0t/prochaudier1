@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Minus, ShoppingCart, Heart, Share2, Star, ZoomIn, ZoomOut, ExternalLink, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Plus, Minus, ShoppingCart, Heart, Share2, Star, ZoomIn, ZoomOut, ExternalLink, RotateCcw, Tag, Folder } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [relatedProductsInfo, setRelatedProductsInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -55,11 +56,13 @@ const ProductDetail = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [id]);
 
-  // Fetch product details from API
+  // Fetch product details and related products from API
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
+        
+        // Fetch main product details
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/product/${id}/`);
         
         if (!response.ok) {
@@ -69,19 +72,32 @@ const ProductDetail = () => {
         const data = await response.json();
         setProduct(data);
         
-        // Fetch related products from the same category
-        if (data.categories && data.categories.length > 0) {
-          const categoryParam = data.categories[0]; 
-          const relatedResponse = await fetch(
-            `${import.meta.env.VITE_API_BASE_URL}/api/products/?categories=${categoryParam}&limit=3`
-          );
-          
-          if (relatedResponse.ok) {
-            const relatedData = await relatedResponse.json();
-            const filtered = relatedData.products.filter(p => p.id !== parseInt(id));
-            setRelatedProducts(filtered.slice(0, 3));
+        // Fetch related products using the enhanced endpoint
+        const relatedResponse = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/product/${id}/related/?limit=4`
+        );
+        
+        if (relatedResponse.ok) {
+          const relatedData = await relatedResponse.json();
+          setRelatedProducts(relatedData.related_products || []);
+          setRelatedProductsInfo(relatedData);
+        } else {
+          // Fallback to the old method if the new endpoint doesn't exist yet
+          console.warn('New related products endpoint not available, using fallback');
+          if (data.categories && data.categories.length > 0) {
+            const categoryParam = data.categories[0]; 
+            const fallbackResponse = await fetch(
+              `${import.meta.env.VITE_API_BASE_URL}/api/products/?categories=${categoryParam}&limit=4`
+            );
+            
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json();
+              const filtered = fallbackData.products.filter(p => p.id !== parseInt(id));
+              setRelatedProducts(filtered.slice(0, 4));
+            }
           }
         }
+        
       } catch (err) {
         setError(err.message);
       } finally {
@@ -236,6 +252,20 @@ const ProductDetail = () => {
   // Open image in new tab
   const openImageInNewTab = (imageUrl) => {
     window.open(imageUrl, '_blank');
+  };
+
+  // Helper function to get relation type badge
+  const getRelationBadge = (relationType) => {
+    switch(relationType) {
+      case 'category':
+        return <Badge variant="secondary" className="text-xs"><Folder className="h-3 w-3 mr-1" />Même catégorie</Badge>;
+      case 'tag':
+        return <Badge variant="outline" className="text-xs"><Tag className="h-3 w-3 mr-1" />Même marque</Badge>;
+      case 'general':
+        return <Badge variant="ghost" className="text-xs">Récent</Badge>;
+      default:
+        return null;
+    }
   };
 
   if (loading) {
@@ -622,14 +652,26 @@ const ProductDetail = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Related Products */}
+        {/* Enhanced Related Products */}
         {relatedProducts.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">Produits similaires</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-foreground">Produits similaires</h2>
+              
+              {/* Show relationship info if available */}
+              {relatedProductsInfo && (
+                <div className="text-sm text-muted-foreground">
+                  {relatedProductsInfo.total_found} produit{relatedProductsInfo.total_found > 1 ? 's' : ''} trouvé{relatedProductsInfo.total_found > 1 ? 's' : ''}
+                </div>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedProducts.map((relatedProduct) => {
                 const relatedProductImage = relatedProduct.main_image 
-                  ? `${import.meta.env.VITE_API_BASE_URL}${relatedProduct.main_image}`
+                  ? (relatedProduct.main_image.startsWith('http') 
+                     ? relatedProduct.main_image 
+                     : `${import.meta.env.VITE_API_BASE_URL}${relatedProduct.main_image}`)
                   : "/placeholder.svg";
 
                 return (
@@ -639,7 +681,7 @@ const ProductDetail = () => {
                     onClick={() => navigate(`/product/${relatedProduct.id}`)}
                   >
                     <CardHeader className="p-4">
-                      <div className="aspect-square bg-secondary rounded-lg mb-4 overflow-hidden">
+                      <div className="aspect-square bg-secondary rounded-lg mb-4 overflow-hidden relative">
                         <img 
                           src={relatedProductImage}
                           onError={(e) => {
@@ -649,25 +691,57 @@ const ProductDetail = () => {
                           alt={relatedProduct.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
+                        
+                        {/* Show relationship badge */}
+                        <div className="absolute top-2 left-2">
+                          {getRelationBadge(relatedProduct.relation_type)}
+                        </div>
                       </div>
+                      
                       {relatedProduct.categories && relatedProduct.categories.length > 0 && (
-                        <Badge variant="secondary" className="text-xs mb-2">
+                        <Badge variant="secondary" className="text-xs mb-2 w-fit">
                           {relatedProduct.categories[0]}
                         </Badge>
                       )}
                       <CardTitle className="text-lg font-semibold line-clamp-2">
                         {relatedProduct.title}
                       </CardTitle>
+                      
+                      {/* Short description if available */}
+                      {relatedProduct.short_description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                          {relatedProduct.short_description}
+                        </p>
+                      )}
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center mb-2">
                         <span className="text-xl font-bold text-brand">
                           {relatedProduct.price ? `${relatedProduct.price} DZD` : 'Prix non disponible'}
                         </span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
                         {relatedProduct.stock_status?.toLowerCase() === 'outofstock' ? (
-                          <span className="text-destructive">✗ Rupture de stock</span>
+                          <span className="text-destructive text-sm">✗ Rupture de stock</span>
                         ) : (
-                          <span className="text-success">✓ En stock</span>
+                          <span className="text-success text-sm">✓ En stock</span>
+                        )}
+                        
+                        {/* Show tags as small badges */}
+                        {relatedProduct.tags && relatedProduct.tags.length > 0 && (
+                          <div className="flex gap-1">
+                            {relatedProduct.tags.slice(0, 2).map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs py-0">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {relatedProduct.tags.length > 2 && (
+                              <span className="text-xs text-muted-foreground">
+                                +{relatedProduct.tags.length - 2}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
                     </CardContent>
@@ -675,6 +749,19 @@ const ProductDetail = () => {
                 );
               })}
             </div>
+            
+            {/* Debug info for development */}
+            {relatedProductsInfo && process.env.NODE_ENV === 'development' && (
+              <div className="mt-4 p-4 bg-secondary rounded-lg">
+                <h3 className="text-sm font-semibold mb-2">Debug Info:</h3>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>Target Product Categories: {relatedProductsInfo.target_product?.categories?.join(', ') || 'None'}</p>
+                  <p>Target Product Tags: {relatedProductsInfo.target_product?.tags?.join(', ') || 'None'}</p>
+                  <p>Related Products Found: {relatedProductsInfo.total_found}</p>
+                  <p>Relation Types: {relatedProducts.map(p => p.relation_type).join(', ')}</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
