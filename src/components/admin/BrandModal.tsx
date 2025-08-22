@@ -236,7 +236,7 @@ const BrandModal: React.FC<BrandModalProps> = ({
                 <div className="mb-4">
                   <div className="relative inline-block">
                     <img 
-                      src={imagePreview} 
+                      src={import.meta.env.VITE_API_BASE_URL + imagePreview} 
                       alt="Preview"
                       className="w-24 h-24 object-cover rounded-lg border border-gray-200"
                     />
@@ -284,7 +284,7 @@ const BrandModal: React.FC<BrandModalProps> = ({
                   <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                     {imagePreview && !removeImage ? (
                       <img 
-                        src={imagePreview} 
+                        src={import.meta.env.VITE_API_BASE_URL + imagePreview} 
                         alt="Preview"
                         className="w-full h-full object-cover"
                       />
