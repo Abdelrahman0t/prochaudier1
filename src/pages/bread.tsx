@@ -422,9 +422,7 @@ const Bread = () => {
           {products.length === 0 && isInitialized && (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-lg">Aucun produit trouvé avec ces filtres.</p>
-              <Button variant="outline" onClick={handleShowAllProducts} className="mt-4">
-                Voir tous les produits
-              </Button>
+
             </div>
           )}
 
