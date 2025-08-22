@@ -20,6 +20,7 @@ const BrandsPage: React.FC = () => {
       const data = await apiClient.getTags();
       console.log("Tags API data:", data.tags);
       setBrands(data.tags);
+      console.log(data)
       setTotalProducts(data.total_products);
       setError(null);
     } catch (err) {
@@ -166,7 +167,7 @@ const BrandsPage: React.FC = () => {
                     <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                       {brand.image_url ? (
                         <img 
-                          src={brand.image_url} 
+                          src={import.meta.env.VITE_API_BASE_URL + brand.image_url} 
                           alt={brand.name}
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -177,7 +178,7 @@ const BrandsPage: React.FC = () => {
                       ) : null}
                       <span 
                         className="text-gray-400 font-medium text-lg flex items-center justify-center w-full h-full"
-                        style={{ display: brand.image_url ? 'none' : 'flex' }}
+                        style={{ display:  brand.image_url ? 'none' : 'flex' }}
                       >
                         {brand.image_url ? <Image className="w-6 h-6" /> : brand.name.charAt(0).toUpperCase()}
                       </span>
