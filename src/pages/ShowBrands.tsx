@@ -90,7 +90,7 @@ const CategoryBrandsPage = () => {
       return (
         <div className={`relative ${className}`}>
           <img
-            src={brand.logo}
+            src={import.meta.env.VITE_API_BASE_URL + brand.logo}
             alt={`Logo ${brand.name}`}
             className="w-full h-full object-contain rounded"
             onError={handleImageError}
