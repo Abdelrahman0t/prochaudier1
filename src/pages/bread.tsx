@@ -42,7 +42,6 @@ const FilterDisplay = ({ selectedCategories, selectedTags, categories, onShowAll
   return (
     <div 
      className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200/60 rounded-lg sm:rounded-xl p-4 mb-6"
-
       onClick={(e) => e.stopPropagation()}
     >
       {/* Mobile: Stack everything vertically */}
@@ -153,48 +152,50 @@ const Bread = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [filtersLoaded, setFiltersLoaded] = useState(false);
+  
+  // NEW: Combined loading states
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load categories for breadcrumb display
+  // Load categories AND initialize filters from URL in one effect
   useEffect(() => {
-    const fetchCategories = async () => {
+    const initializeFilters = async () => {
       try {
+        // Fetch categories first
         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/categories-tags/`);
         const data = await res.json();
         setCategories(data.categories);
-        setFiltersLoaded(true);
+
+        // Then process URL parameters
+        const categoriesParam = searchParams.get("categories");
+        const tagsParam = searchParams.get("tags");
+
+        if (categoriesParam) {
+          const categoryList = categoriesParam.split(",").filter(Boolean);
+          setSelectedCategories(categoryList);
+        }
+
+        if (tagsParam) {
+          const tagList = tagsParam.split(",").filter(Boolean);
+          setSelectedTags(tagList);
+        }
+
+        // Mark as initialized only after BOTH categories and URL params are processed
+        setIsInitialized(true);
+        setCurrentPage(1);
+        
       } catch (err) {
-        console.error('❌ Error fetching categories', err);
+        console.error('❌ Error initializing filters', err);
+        // Even on error, mark as initialized to prevent infinite loading
+        setIsInitialized(true);
       }
     };
 
-    fetchCategories();
-  }, []);
+    initializeFilters();
+  }, [searchParams]); // Only depend on searchParams
 
-  // Handle URL parameters
+  // Fetch products - only run when properly initialized
   useEffect(() => {
-    if (!filtersLoaded) return;
-
-    const categoriesParam = searchParams.get("categories");
-    const tagsParam = searchParams.get("tags");
-
-    // Set filters from URL
-    if (categoriesParam) {
-      const categoryList = categoriesParam.split(",").filter(Boolean);
-      setSelectedCategories(categoryList);
-    }
-
-    if (tagsParam) {
-      const tagList = tagsParam.split(",").filter(Boolean);
-      setSelectedTags(tagList);
-    }
-
-    setCurrentPage(1);
-  }, [searchParams, filtersLoaded]);
-
-  // Fetch products
-  useEffect(() => {
-    if (!filtersLoaded) return;
+    if (!isInitialized) return;
 
     const fetchProducts = async () => {
       try {
@@ -224,7 +225,7 @@ const Bread = () => {
     };
 
     fetchProducts();
-  }, [filtersLoaded, selectedCategories, selectedTags, currentPage]);
+  }, [isInitialized, selectedCategories, selectedTags, currentPage]);
 
   // Show all products handler
   const handleShowAllProducts = () => {
@@ -418,7 +419,7 @@ const Bread = () => {
           </div>
 
           {/* No products message */}
-          {products.length === 0 && filtersLoaded && (
+          {products.length === 0 && isInitialized && (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-lg">Aucun produit trouvé avec ces filtres.</p>
               <Button variant="outline" onClick={handleShowAllProducts} className="mt-4">
@@ -426,80 +427,87 @@ const Bread = () => {
               </Button>
             </div>
           )}
+
+          {/* Loading state */}
+          {!isInitialized && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground text-lg">Chargement des produits...</p>
+            </div>
+          )}
         </main>
       </div>
 
       {/* Pagination */}
-{products.length > 0 && totalPages > 1 && (
-  <div className="flex justify-center items-center mt-8 gap-2 pb-16">
-    {/* First Page Button */}
-    <Button
-      variant="ghost"
-      className="w-8 h-8 p-0 rounded-full bg-gray-50 hover:bg-gray-200 border-0"
-      onClick={() => setCurrentPage(1)}
-      disabled={currentPage === 1}
-      title="Go to first page"
-    >
-      <ChevronsLeft className="w-4 h-4" />
-    </Button>
-    
-    {/* Previous Page Button */}
-    <Button
-      variant="ghost"
-      className="w-8 h-8 p-0 rounded-full bg-gray-50 hover:bg-gray-200 border-0"
-      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-      disabled={currentPage === 1}
-      title="Previous page"
-    >
-      <ChevronLeft className="w-4 h-4" />
-    </Button>
-    
-    {/* Page Number Buttons */}
-    {Array.from({ length: Math.min(totalPages, 4) }).map((_, index) => {
-      const windowStart = Math.max(
-        1,
-        Math.min(
-          currentPage - 2,
-          totalPages - 3
-        )
-      );
-      const page = windowStart + index;
+      {products.length > 0 && totalPages > 1 && (
+        <div className="flex justify-center items-center mt-8 gap-2 pb-16">
+          {/* First Page Button */}
+          <Button
+            variant="ghost"
+            className="w-8 h-8 p-0 rounded-full bg-gray-50 hover:bg-gray-200 border-0"
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            title="Go to first page"
+          >
+            <ChevronsLeft className="w-4 h-4" />
+          </Button>
+          
+          {/* Previous Page Button */}
+          <Button
+            variant="ghost"
+            className="w-8 h-8 p-0 rounded-full bg-gray-50 hover:bg-gray-200 border-0"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            title="Previous page"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          
+          {/* Page Number Buttons */}
+          {Array.from({ length: Math.min(totalPages, 4) }).map((_, index) => {
+            const windowStart = Math.max(
+              1,
+              Math.min(
+                currentPage - 2,
+                totalPages - 3
+              )
+            );
+            const page = windowStart + index;
 
-      return (
-        <Button
-          key={page}
-          variant={currentPage === page ? "default" : "outline"}
-          className="px-4 py-2 text-sm"
-          onClick={() => setCurrentPage(page)}
-        >
-          {page}
-        </Button>
-      );
-    })}
-    
-    {/* Next Page Button */}
-    <Button
-      variant="ghost"
-      className="w-8 h-8 p-0 rounded-full bg-gray-50 hover:bg-gray-200 border-0"
-      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-      disabled={currentPage === totalPages}
-      title="Next page"
-    >
-      <ChevronRight className="w-4 h-4" />
-    </Button>
-    
-    {/* Last Page Button */}
-    <Button
-      variant="ghost"
-      className="w-8 h-8 p-0 rounded-full bg-gray-50 hover:bg-gray-200 border-0"
-      onClick={() => setCurrentPage(totalPages)}
-      disabled={currentPage === totalPages}
-      title="Go to last page"
-    >
-      <ChevronsRight className="w-4 h-4" />
-    </Button>
-  </div>
-)}
+            return (
+              <Button
+                key={page}
+                variant={currentPage === page ? "default" : "outline"}
+                className="px-4 py-2 text-sm"
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </Button>
+            );
+          })}
+          
+          {/* Next Page Button */}
+          <Button
+            variant="ghost"
+            className="w-8 h-8 p-0 rounded-full bg-gray-50 hover:bg-gray-200 border-0"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            title="Next page"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+          
+          {/* Last Page Button */}
+          <Button
+            variant="ghost"
+            className="w-8 h-8 p-0 rounded-full bg-gray-50 hover:bg-gray-200 border-0"
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+            title="Go to last page"
+          >
+            <ChevronsRight className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
 
       <Footer />
     </div>
