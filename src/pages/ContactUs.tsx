@@ -153,8 +153,9 @@ const ContactUs = () => {
                   <h3 className="font-bold text-xl">Notre localisation</h3>
                 </div>
                 <div className="mb-4">
+
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1597.7592543287128!2d2.9817415975532704!3d36.78211671038063!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x128fb13379f87abf%3A0xc4b9f5fe0e4d3d00!2sParagon%20Reisen!5e0!3m2!1sfr!2sdz!4v1754693175938!5m2!1sfr!2sdz"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3200.1438340321774!2d2.9526308!3d36.6710426!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x43b9f79c42b3ca8b%3A0x9d94fb1cfee3c908!2sEURL%20PROCHAUDIERE%20%2F%20SAV%20FACOFRI!5e0!3m2!1sar!2seg!4v1755870183988!5m2!1sar!2seg"
                     width="100%"
                     height="250"
                     style={{ border: 0 }}
