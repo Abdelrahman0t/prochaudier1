@@ -31,6 +31,7 @@ const CategoryBrandsPage = () => {
         }
         
         const data = await response.json();
+        console.log(data.brands)
         setCategory(data.category);
         setBrands(data.brands); // These will be the tags
       } catch (err) {
@@ -92,18 +93,18 @@ const CategoryBrandsPage = () => {
           <img
             src={import.meta.env.VITE_API_BASE_URL + brand.logo}
             alt={`Logo ${brand.name}`}
-            className="w-full h-full object-contain rounded"
+            className="w-full h-full object-contain rounded-lg shadow-sm"
             onError={handleImageError}
           />
           {/* Fallback icon - hidden by default, shown when image fails */}
           <div 
-            className="absolute inset-0 bg-brand/10 rounded flex items-center justify-center"
+            className="absolute inset-0 bg-brand/10 rounded-lg flex items-center justify-center shadow-sm"
             style={{ display: 'none' }}
           >
             <img
             src='/product_placeholder.jpg'
             alt={`Logo ${brand.name}`}
-            className="w-full h-full object-contain rounded"
+            className="w-full h-full object-contain rounded-lg"
             onError={handleImageError}
           />
           </div>
@@ -113,11 +114,11 @@ const CategoryBrandsPage = () => {
     
     // No image available - show placeholder
     return (
-      <div className={`${className} bg-brand/10 rounded flex items-center justify-center`}>
+      <div className={`${className} bg-brand/10 rounded-lg flex items-center justify-center shadow-sm`}>
         <img
           src='/product_placeholder.jpg'
           alt={`Logo ${brand.name}`}
-          className="w-full h-full object-contain rounded"
+          className="w-full h-full object-contain rounded-lg"
           onError={handleImageError}
         />
       </div>
@@ -188,10 +189,10 @@ const CategoryBrandsPage = () => {
                 <Button 
                   onClick={handleViewAllProducts}
                   variant="outline"
-                  className="hover:bg-brand/10 hover:border-brand transition-colors w-full text-xs"
-                  size="sm"
+                  className="hover:bg-brand/10 hover:border-brand transition-colors w-full text-base py-3"
+                  size="lg"
                 >
-                  <Package className="h-4 w-4 mr-2" />
+                  <Package className="h-5 w-5 mr-3" />
                   Tous les produits
                 </Button>
               </div>
@@ -226,10 +227,10 @@ const CategoryBrandsPage = () => {
                   <Button 
                     onClick={handleViewAllProducts}
                     variant="outline"
-                    className="hover:bg-brand/10 hover:border-brand transition-colors text-xs px-2 py-1 h-8"
-                    size="sm"
+                    className="hover:bg-brand/10 hover:border-brand transition-colors text-sm px-4 py-2 h-10"
+                    size="default"
                   >
-                    <Package className="h-3 w-3 mr-1" />
+                    <Package className="h-4 w-4 mr-2" />
                     Tous les produits
                   </Button>
                 </div>
@@ -247,26 +248,29 @@ const CategoryBrandsPage = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 lg:gap-10">
               {sortedBrands.map((brand) => (
                 <div
                   key={brand.id}
                   onClick={() => handleBrandClick(brand)}
-                  className="bg-white p-3 sm:p-4 lg:p-6 rounded-lg shadow-sm border hover:shadow-md cursor-pointer transition-all duration-200 hover:border-brand/30 hover:bg-brand/5"
+                  className="bg-white p-6 sm:p-8 lg:p-10 xl:p-12 rounded-2xl shadow-lg border-2 border-transparent hover:border-brand/40 hover:shadow-xl cursor-pointer transition-all duration-300 transform hover:-translate-y-2 hover:bg-gradient-to-br hover:from-white hover:to-brand/5 group"
                 >
                   <div className="text-center">
-                    <div className="mb-2 sm:mb-3 lg:mb-4">
+                    <div className="mb-6 sm:mb-8 lg:mb-10 flex items-center justify-center">
                       <BrandLogo 
                         brand={brand}
-                        className="h-12 w-12 sm:h-16 sm:w-16 lg:h-20 lg:w-20 mx-auto"
+                        className="h-24 w-24 sm:h-32 sm:w-32 lg:h-40 lg:w-40 xl:h-48 xl:w-48 transition-transform duration-300 group-hover:scale-105"
                       />
                     </div>
                     
-                    <div>
-                      <h3 className="font-medium sm:font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base text-center line-clamp-2">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="font-bold text-gray-900 text-lg sm:text-xl lg:text-2xl text-center leading-tight group-hover:text-brand transition-colors duration-300">
                         {brand.name}
                       </h3>
-                      <Badge variant="secondary" className="text-[10px] sm:text-xs">
+                      <Badge 
+                        variant="secondary" 
+                        className="text-sm sm:text-base px-4 py-2 bg-brand/10 text-brand hover:bg-brand hover:text-white transition-all duration-300 font-semibold"
+                      >
                         {brand.product_count} produit{brand.product_count !== 1 ? 's' : ''}
                       </Badge>
                     </div>
@@ -295,9 +299,10 @@ const CategoryBrandsPage = () => {
             <Button 
               onClick={() => navigate('/allbrands')}
               variant="outline"
-              className="hover:bg-brand/10 hover:border-brand transition-colors text-sm px-6 py-2"
+              className="hover:bg-brand/10 hover:border-brand transition-colors text-base px-8 py-3 h-12"
+              size="lg"
             >
-              <Building2 className="h-4 w-4 mr-2" />
+              <Building2 className="h-5 w-5 mr-3" />
               Voir toutes nos marques
             </Button>
           </div>
