@@ -146,14 +146,16 @@ const ContactSupport = () => {
                 <div>
                   <p className="font-medium text-foreground mb-2">Siège social</p>
                   <p className="text-muted-foreground">
-                    Zone industrielle<br />
-                    France<br />
+                    92 Salem Madani N° 11 bis 01 Rdc<br />
+
+                    Douera, Alger<br />
+  Algérie<br />
                   </p>
                 </div>
                 
                 <div className="pt-4 border-t border-border/50">
                   <p className="text-sm text-muted-foreground mb-3">
-                    Livraison dans toute la France métropolitaine et DOM-TOM
+                    92 Salem Madani, N°11 bis 01, RDC, Douera, Alger, Algeria
                   </p>
                   <Button variant="outline" size="sm">
                     <MapPin className="h-4 w-4 mr-2" />

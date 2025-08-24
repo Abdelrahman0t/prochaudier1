@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Category } from "../../types/admin";
-import { Plus, Edit, Trash2, ChevronRight, ChevronDown } from "lucide-react";
+import { Plus, Edit, Trash2, ChevronRight, ChevronDown, Image } from "lucide-react";
 import CategoryModal from "./CategoryModal";
 import { apiClient } from "../../api/api"; // <-- Import your API client
 
@@ -30,18 +30,23 @@ const fetchCategories = async () => {
     fetchCategories();
   }, []);
 
-  const handleCreateCategory = async (categoryData: Omit<Category, "id">) => {
+const handleCreateCategory = async (categoryData: FormData | Omit<Category, "id">) => {
     try {
-      await apiClient.createCategory(categoryData);
+      await apiClient.createCategory2(categoryData);
       fetchCategories();
     } catch (error) {
       console.error("Failed to create category:", error);
     }
   };
 
-  const handleUpdateCategory = async (category: Category) => {
+  const handleUpdateCategory = async (categoryData: FormData | Partial<Category>) => {
     try {
-      await apiClient.updateCategory(category.id, category);
+      if (!editingCategory) {
+        console.error('No editing category selected');
+        return;
+      }
+      
+      await apiClient.updateCategory(editingCategory.id, categoryData);
       fetchCategories();
     } catch (error) {
       console.error("Failed to update category:", error);
@@ -49,7 +54,7 @@ const fetchCategories = async () => {
   };
 
   const handleDeleteCategory = async (categoryId: number) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    if (!window.confirm("Deleting a category will delete all of its subcategories, Are you sure you want to delete this category?")) return;
     try {
       await apiClient.deleteCategory(categoryId);
       fetchCategories();
@@ -68,9 +73,21 @@ const fetchCategories = async () => {
     setExpandedCategories(newExpanded);
   };
 
+  // Helper function to get full image URL
+  const getImageUrl = (imageUrl: string | null) => {
+    if (!imageUrl) return null;
+    
+    // If it's already a full URL, return as-is
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    
+    // Otherwise, prepend the API base URL
+    return import.meta.env.VITE_API_BASE_URL + imageUrl;
+  };
 
 const getBranchedProductCount = (category: Category): number => {
-  let total = 0; // exclude parent’s own count
+  let total = 0; // exclude parent's own count
   if (category.children && category.children.length > 0) {
     for (const child of category.children) {
       total += (child.product_count || 0) + getBranchedProductCount(child);
@@ -78,8 +95,6 @@ const getBranchedProductCount = (category: Category): number => {
   }
   return total;
 };
-
-
 
 const getBranchedCategoryCount = (category: Category): number => {
   let total = 0;
@@ -96,6 +111,7 @@ const renderCategory = (category: Category, level: number = 0) => {
   const hasChildren = category.children && category.children.length > 0;
   const isExpanded = expandedCategories.has(category.id);
   const branchedCount = hasChildren ? getBranchedProductCount(category) : 0;
+  const imageUrl = getImageUrl(category.image_url || null);
 
   return (
     <div key={category.id}>
@@ -119,16 +135,30 @@ const renderCategory = (category: Category, level: number = 0) => {
             <div className="w-6 h-6" />
           )}
 
+          {/* Category Image - only show if image exists */}
+          {imageUrl && (
+            <div className="flex-shrink-0">
+              <img
+                src={imageUrl}
+                alt={category.name}
+                className="w-12 h-12 object-cover rounded-lg border border-gray-200"
+                onError={(e) => {
+                  // Hide the image if it fails to load
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+
           <div>
             <h3 className="font-medium text-gray-900">{category.name}</h3>
-<p className="text-sm text-gray-500">
-  {category.product_count || 0} products
-  {getBranchedCategoryCount(category) > 0 && (
-    <> • {getBranchedCategoryCount(category)} branched categories ({getBranchedProductCount(category)})</>
-  )}
-  {level > 0 && " • Subcategory"}
-</p>
-
+            <p className="text-sm text-gray-500">
+              {category.product_count || 0} products
+              {getBranchedCategoryCount(category) > 0 && (
+                <> • {getBranchedCategoryCount(category)} branched categories ({getBranchedProductCount(category)})</>
+              )}
+              {level > 0 && " • Subcategory"}
+            </p>
           </div>
         </div>
 
@@ -158,7 +188,6 @@ const renderCategory = (category: Category, level: number = 0) => {
   );
 };
 
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -180,37 +209,38 @@ const renderCategory = (category: Category, level: number = 0) => {
       </div>
 
       {/* Stats */}
-<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <p className="text-sm font-medium text-gray-600">Total Categories</p>
-    <p className="text-2xl font-bold text-gray-900 mt-2">
-      {/* Total = Parent categories + All subcategories */}
-      {categories.length + categories.reduce(
-        (count, c) => count + (c.children ? c.children.length : 0),
-        0
-      )}
-    </p>
-  </div>
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <p className="text-sm font-medium text-gray-600">Parent Categories</p>
-    <p className="text-2xl font-bold text-gray-900 mt-2">{categories.length}</p>
-  </div>
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <p className="text-sm font-medium text-gray-600">Subcategories</p>
-    <p className="text-2xl font-bold text-gray-900 mt-2">
-      {/* Count all nested children */}
-      {categories.reduce(
-        (count, c) => count + (c.children ? c.children.length : 0),
-        0
-      )}
-    </p>
-  </div>
-</div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <p className="text-sm font-medium text-gray-600">Total Categories</p>
+          <p className="text-2xl font-bold text-gray-900 mt-2">
+            {/* Total = Parent categories + All subcategories */}
+            {categories.length + categories.reduce(
+              (count, c) => count + (c.children ? c.children.length : 0),
+              0
+            )}
+          </p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <p className="text-sm font-medium text-gray-600">Parent Categories</p>
+          <p className="text-2xl font-bold text-gray-900 mt-2">{categories.length}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <p className="text-sm font-medium text-gray-600">Subcategories</p>
+          <p className="text-2xl font-bold text-gray-900 mt-2">
+            {/* Count all nested children */}
+            {categories.reduce(
+              (count, c) => count + (c.children ? c.children.length : 0),
+              0
+            )}
+          </p>
+        </div>
+      </div>
 
       {/* Categories Tree */}
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div className="p-6 border-b">
           <h3 className="text-lg font-semibold text-gray-900">Category Hierarchy</h3>
+          <p className="text-sm text-gray-500 mt-1">Categories with images will display their thumbnails</p>
         </div>
         {loading ? (
           <div className="p-12 text-center text-gray-500">Loading...</div>
@@ -229,7 +259,7 @@ const renderCategory = (category: Category, level: number = 0) => {
           categories={categories}
           onSave={(data) =>
             editingCategory
-              ? handleUpdateCategory({ ...editingCategory, ...data })
+              ? handleUpdateCategory(data)
               : handleCreateCategory(data)
           }
           onClose={() => setIsModalOpen(false)}

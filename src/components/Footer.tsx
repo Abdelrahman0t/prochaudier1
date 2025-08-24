@@ -60,7 +60,7 @@ const Footer = () => {
               </div>
               
               <p className="text-background/70 leading-relaxed mb-6 max-w-md">
-                Spécialiste depuis 15 ans dans la vente de pièces détachées pour chaudières 
+                Spécialiste depuis 4 ans dans la vente de pièces détachées pour chaudières 
                 de toutes marques. Qualité, rapidité et expertise à votre service.
               </p>
               
@@ -75,7 +75,7 @@ const Footer = () => {
                 </div>
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 text-brand mr-3" />
-                  <span className="text-background/90">Zone industrielle, France</span>
+                  <span className="text-background/90">92 Salem Madani, N°11 bis 01, RDC, Douera, Alger, Algeria</span>
                 </div>
               </div>
             </div>
@@ -175,7 +175,7 @@ const Footer = () => {
           <div className="mt-8 pt-8 border-t border-background/20 text-center">
             <p className="text-sm text-background/60">
               © 2024 Pro Chaudière. Tous droits réservés. | 
-              <span className="text-brand ml-1">Développé par Zebra Com</span> | 
+              <span className="text-brand ml-1">Développé par HANANE TAREK</span> | 
               <span className="ml-1">Tous les droits réservés à Pro Chaudière</span>
             </p>
           </div>

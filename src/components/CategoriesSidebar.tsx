@@ -39,6 +39,19 @@ const CategoriesSidebar = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
+  // Helper function to get full image URL
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return null;
+    
+    // If it's already a full URL, return as-is
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    
+    // Otherwise, prepend the API base URL
+    return import.meta.env.VITE_API_BASE_URL + imageUrl;
+  };
+
   const handleParentClick = (category) => {
     if (category.children && category.children.length > 0) {
       setSelectedParent(category);
@@ -123,34 +136,51 @@ const CategoriesSidebar = ({ isOpen, onClose }) => {
                   Aucune catégorie disponible
                 </div>
               ) : (
-                categories.map((category) => (
-                  <div key={category.id} className="border-b border-gray-200 last:border-b-0">
-                    <div 
-                      className="p-4 hover:bg-gray-50 cursor-pointer group transition-colors duration-150"
-                      onClick={() => handleParentClick(category)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                categories.map((category) => {
+                  const imageUrl = getImageUrl(category.image_url);
+                  return (
+                    <div key={category.id} className="border-b border-gray-200 last:border-b-0">
+                      <div 
+                        className="p-4 hover:bg-gray-50 cursor-pointer group transition-colors duration-150"
+                        onClick={() => handleParentClick(category)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {/* Category Image - only show if image exists */}
+                            {imageUrl && (
+                              <div className="flex-shrink-0">
+                                <img
+                                  src={imageUrl}
+                                  alt={category.name}
+                                  className="w-10 h-10 object-cover rounded-lg border border-gray-200"
+                                  onError={(e) => {
+                                    // Hide the image if it fails to load
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            )}
 
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-gray-900 group-hover:text-brand transition-colors break-words">
-                              {category.name}
-                            </div>
-                            <div className="text-sm text-gray-500 mt-0.5">
-                              {category.count} produit{category.count !== 1 ? 's' : ''}
-                              {category.children && category.children.length > 0 && (
-                                <span className="ml-2">• {category.children.length} sous-catégorie{category.children.length !== 1 ? 's' : ''}</span>
-                              )}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-gray-900 group-hover:text-brand transition-colors break-words">
+                                {category.name}
+                              </div>
+                              <div className="text-sm text-gray-500 mt-0.5">
+                                {category.count} produit{category.count !== 1 ? 's' : ''}
+                                {category.children && category.children.length > 0 && (
+                                  <span className="ml-2">• {category.children.length} sous-catégorie{category.children.length !== 1 ? 's' : ''}</span>
+                                )}
+                              </div>
                             </div>
                           </div>
+                          {category.children && category.children.length > 0 && (
+                            <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-brand transition-colors flex-shrink-0" />
+                          )}
                         </div>
-                        {category.children && category.children.length > 0 && (
-                          <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-brand transition-colors flex-shrink-0" />
-                        )}
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
@@ -177,12 +207,29 @@ const CategoriesSidebar = ({ isOpen, onClose }) => {
                   onClick={handleViewParentCategory}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="font-medium text-brand break-words">
-                        {selectedParent.name}
-                      </div>
-                      <div className="text-sm text-gray-600 mt-0.5">
-                        {selectedParent.count} produit{selectedParent.count !== 1 ? 's' : ''} au total
+                    <div className="flex items-center gap-3">
+                      {/* Parent Category Image - only show if image exists */}
+                      {getImageUrl(selectedParent.image_url) && (
+                        <div className="flex-shrink-0">
+                          <img
+                            src={getImageUrl(selectedParent.image_url)}
+                            alt={selectedParent.name}
+                            className="w-10 h-10 object-cover rounded-lg border border-gray-200"
+                            onError={(e) => {
+                              // Hide the image if it fails to load
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="flex-1">
+                        <div className="font-medium text-brand break-words">
+                          {selectedParent.name}
+                        </div>
+                        <div className="text-sm text-gray-600 mt-0.5">
+                          {selectedParent.count} produit{selectedParent.count !== 1 ? 's' : ''} au total
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -194,31 +241,50 @@ const CategoriesSidebar = ({ isOpen, onClose }) => {
 
               {/* Children List */}
               {selectedParent.children && selectedParent.children.length > 0 ? (
-                selectedParent.children.map((child) => (
-                  <div key={child.id} className="border-b border-gray-200 last:border-b-0">
-                    <div 
-                      className="p-4 hover:bg-gray-50 cursor-pointer group transition-colors duration-150"
-                      onClick={() => handleChildClick(child)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0">
-                            <Tag className="h-4 w-4 text-brand/70 group-hover:text-brand transition-colors" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-gray-900 group-hover:text-brand transition-colors break-words">
-                              {child.name}
+                selectedParent.children.map((child) => {
+                  const childImageUrl = getImageUrl(child.image_url);
+                  return (
+                    <div key={child.id} className="border-b border-gray-200 last:border-b-0">
+                      <div 
+                        className="p-4 hover:bg-gray-50 cursor-pointer group transition-colors duration-150"
+                        onClick={() => handleChildClick(child)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {/* Child Category Image or Tag Icon */}
+                            {childImageUrl ? (
+                              <div className="flex-shrink-0">
+                                <img
+                                  src={childImageUrl}
+                                  alt={child.name}
+                                  className="w-8 h-8 object-cover rounded-lg border border-gray-200"
+                                  onError={(e) => {
+                                    // Hide the image if it fails to load
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <div className="flex-shrink-0">
+                                <Tag className="h-4 w-4 text-brand/70 group-hover:text-brand transition-colors" />
+                              </div>
+                            )}
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-gray-900 group-hover:text-brand transition-colors break-words">
+                                {child.name}
+                              </div>
+                              <div className="text-sm text-gray-500 mt-0.5">
+                                {child.count} produit{child.count !== 1 ? 's' : ''}
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-500 mt-0.5">
-                              {child.count} produit{child.count !== 1 ? 's' : ''}
-                            </div>
                           </div>
+                          <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-brand transition-colors flex-shrink-0" />
                         </div>
-                        <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-brand transition-colors flex-shrink-0" />
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div className="p-4 text-center text-gray-500">
                   Aucune sous-catégorie disponible

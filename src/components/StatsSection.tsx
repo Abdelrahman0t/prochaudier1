@@ -3,7 +3,7 @@ const StatsSection = () => {
     { number: "1000+", label: "Pièces en stock" },
     { number: "5000+", label: "Clients satisfaits" },
     { number: "24h", label: "Délai de livraison" },
-    { number: "15ans", label: "D'expérience" }
+    { number: "depuis 2023", label: "D'expérience" }
   ];
 
   return (

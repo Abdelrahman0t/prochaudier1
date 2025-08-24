@@ -26,9 +26,9 @@ const CartSidebar = () => {
 
 const formatPrice = (price?: number) => {
   if (typeof price !== "number" || isNaN(price)) {
-    return "0.00€"; // or return "" if you prefer empty
+    return "0.00 DZD"; // or return "" if you prefer empty
   }
-  return `${price.toFixed(2)}€`;
+  return `${price.toFixed(2)} DZD`;
 };
 
   return (

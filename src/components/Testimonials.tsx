@@ -26,7 +26,7 @@ const Testimonials = () => {
       name: "Jean-Paul M.",
       location: "Marseille", 
       rating: 5,
-      text: "15 ans que je fais confiance à Pro Chaudière. Toujours des pièces de qualité et un service client au top. C'est rare de nos jours !",
+      text: "3 ans que je fais confiance à Pro Chaudière. Toujours des pièces de qualité et un service client au top. C'est rare de nos jours !",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
       verified: true,
     },

@@ -38,12 +38,13 @@ const Header = () => {
 
   // 🔍 Shared search component (used in both mobile and desktop)
 // 🔍 Updated SearchWithDropdown component for your existing header
+// Replace your existing SearchWithDropdown component in Header.jsx with this:
+
 const SearchWithDropdown = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const wrapperRef = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!searchTerm.trim()) {
@@ -64,6 +65,10 @@ const SearchWithDropdown = () => {
           setSuggestions(sortedData);
           console.log(sortedData);
           setDropdownOpen(true);
+        })
+        .catch(error => {
+          console.error('Error fetching suggestions:', error);
+          setSuggestions([]);
         });
     }, 300);
 
@@ -79,6 +84,27 @@ const SearchWithDropdown = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Handle search submission (Enter key or search button)
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    if (searchTerm.trim()) {
+      // Navigate to search results page with search term as query parameter
+      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+      setDropdownOpen(false);
+      setSearchTerm('');
+    }
+  };
+
+  // Handle Enter key press
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearch();
+    } else if (e.key === 'Escape') {
+      setDropdownOpen(false);
+    }
+  };
 
   // Updated handleSelect to handle both products and tags
   const handleSelect = (item) => {
@@ -98,6 +124,7 @@ const SearchWithDropdown = () => {
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyDown={handleKeyDown} // Add this line for Enter key support
         placeholder="Rechercher des pièces détachées..."
         className="pl-10 bg-secondary/50 border-border/50 focus:border-brand transition-colors"
         onFocus={() => searchTerm && setDropdownOpen(true)}
@@ -105,11 +132,14 @@ const SearchWithDropdown = () => {
       {/* Enhanced search suggestions dropdown */}
       <div 
         className={`absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto transition-all duration-200 ease-in-out ${
-          dropdownOpen && suggestions.length > 0 
+          dropdownOpen && (suggestions.length > 0 || searchTerm.trim())
             ? 'opacity-100 scale-100' 
             : 'opacity-0 scale-95 pointer-events-none'
         }`}
       >
+        {/* Show "Search for..." option when typing */}
+
+
         {suggestions.map((item) => (
           <div
             key={`${item.type || 'product'}-${item.id}`}

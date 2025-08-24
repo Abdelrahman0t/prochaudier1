@@ -40,7 +40,7 @@ const WhyChooseUs = () => {
     },
     {
       icon: Award,
-      title: "15 ans d'expérience",
+      title: "Expérience depuis 2023",
       description: "Spécialiste reconnu dans le domaine des pièces détachées pour chaudières depuis 2009.",
       color: "text-red-600",
       bgColor: "bg-red-50",
@@ -119,7 +119,7 @@ const WhyChooseUs = () => {
             
             <div className="group">
               <div className="text-3xl md:text-4xl font-bold text-brand mb-2 group-hover:scale-110 transition-transform">
-                15ans
+                depuis 2023
               </div>
               <div className="text-muted-foreground font-medium">
                 D'expérience
