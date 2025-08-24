@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Category } from "../../types/admin";
-import { Plus, Edit, Trash2, ChevronRight, ChevronDown, Image } from "lucide-react";
+import { Plus, Edit, Trash2, ChevronRight, ChevronDown, Image, Search, X } from "lucide-react";
 import CategoryModal from "./CategoryModal";
 import { apiClient } from "../../api/api"; // <-- Import your API client
 
@@ -12,6 +12,7 @@ const CategoriesPage: React.FC = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   
 const fetchCategories = async () => {
@@ -107,11 +108,81 @@ const getBranchedCategoryCount = (category: Category): number => {
   return total;
 };
 
+// Search functionality
+const searchInCategory = (category: Category, query: string): Category | null => {
+  const normalizedQuery = query.toLowerCase().trim();
+  if (!normalizedQuery) return category;
+
+  // Check if current category matches
+  const categoryMatches = category.name.toLowerCase().includes(normalizedQuery);
+  
+  // Check children recursively
+  const matchingChildren: Category[] = [];
+  if (category.children) {
+    for (const child of category.children) {
+      const matchingChild = searchInCategory(child, query);
+      if (matchingChild) {
+        matchingChildren.push(matchingChild);
+      }
+    }
+  }
+
+  // Return category if it matches or has matching children
+  if (categoryMatches || matchingChildren.length > 0) {
+    return {
+      ...category,
+      children: matchingChildren.length > 0 ? matchingChildren : category.children
+    };
+  }
+
+  return null;
+};
+
+const filterCategories = (categories: Category[], query: string): Category[] => {
+  if (!query.trim()) return categories;
+  
+  const filtered: Category[] = [];
+  for (const category of categories) {
+    const matchingCategory = searchInCategory(category, query);
+    if (matchingCategory) {
+      filtered.push(matchingCategory);
+    }
+  }
+  return filtered;
+};
+
+// Auto-expand categories when searching
+useEffect(() => {
+  if (searchQuery.trim()) {
+    const expandAll = (cats: Category[]): Set<number> => {
+      const expanded = new Set<number>();
+      const addToExpanded = (category: Category) => {
+        expanded.add(category.id);
+        if (category.children) {
+          category.children.forEach(addToExpanded);
+        }
+      };
+      cats.forEach(addToExpanded);
+      return expanded;
+    };
+    
+    const filteredCats = filterCategories(categories, searchQuery);
+    setExpandedCategories(expandAll(filteredCats));
+  }
+}, [searchQuery, categories]);
+
+const clearSearch = () => {
+  setSearchQuery("");
+  setExpandedCategories(new Set());
+};
+
 const renderCategory = (category: Category, level: number = 0) => {
   const hasChildren = category.children && category.children.length > 0;
   const isExpanded = expandedCategories.has(category.id);
   const branchedCount = hasChildren ? getBranchedProductCount(category) : 0;
   const imageUrl = getImageUrl(category.image_url || null);
+
+
 
   return (
     <div key={category.id}>
@@ -151,7 +222,9 @@ const renderCategory = (category: Category, level: number = 0) => {
           )}
 
           <div>
-            <h3 className="font-medium text-gray-900">{category.name}</h3>
+            <h3 className="font-medium text-gray-900">
+              {category.name}
+            </h3>
             <p className="text-sm text-gray-500">
               {category.product_count || 0} products
               {getBranchedCategoryCount(category) > 0 && (
@@ -188,6 +261,8 @@ const renderCategory = (category: Category, level: number = 0) => {
   );
 };
 
+  const filteredCategories = filterCategories(categories, searchQuery);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -206,6 +281,33 @@ const renderCategory = (category: Category, level: number = 0) => {
           <Plus className="w-4 h-4" />
           <span>Add Category</span>
         </button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="bg-white rounded-lg shadow-sm border p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search categories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={clearSearch}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <p className="text-sm text-gray-500 mt-2">
+            {filteredCategories.length} categories found for "{searchQuery}"
+          </p>
+        )}
       </div>
 
       {/* Stats */}
@@ -244,8 +346,14 @@ const renderCategory = (category: Category, level: number = 0) => {
         </div>
         {loading ? (
           <div className="p-12 text-center text-gray-500">Loading...</div>
-        ) : categories.length > 0 ? (
-          categories.map((category) => renderCategory(category))
+        ) : filteredCategories.length > 0 ? (
+          filteredCategories.map((category) => renderCategory(category))
+        ) : searchQuery ? (
+          <div className="p-12 text-center text-gray-500">
+            <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <p className="text-lg font-medium text-gray-600 mb-2">No categories found</p>
+            <p>Try adjusting your search terms or <button onClick={clearSearch} className="text-sky-600 hover:text-sky-700 underline">clear the search</button></p>
+          </div>
         ) : (
           <div className="p-12 text-center text-gray-500">
             No categories found. Create your first category to get started.

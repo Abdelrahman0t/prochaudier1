@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Order } from '../../types/admin';
-import { Eye, Search, Filter, Download, MoreHorizontal, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Eye, Search, Filter, Download, MoreHorizontal, RefreshCw, AlertTriangle, Hash } from 'lucide-react';
 import { apiClient } from '../../api/api';
 
 interface OrdersPageProps {
@@ -12,6 +12,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onViewOrder }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [idSearch, setIdSearch] = useState(''); // New state for ID search
   const [statusFilter, setStatusFilter] = useState<Order['status'] | 'all'>('all');
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
@@ -82,12 +83,15 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onViewOrder }) => {
     const searchString = searchTerm.toLowerCase();
     const matchesSearch = 
       order.customer_name?.toLowerCase().includes(searchString) ||
-      order.id?.toString().toLowerCase().includes(searchString) ||
       order.customer_email?.toLowerCase().includes(searchString) ||
       order.customer_phone?.toLowerCase().includes(searchString);
     
+    // ID search filter
+    const matchesIdSearch = idSearch === '' || 
+      order.id?.toString().toLowerCase().includes(idSearch.toLowerCase());
+    
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesIdSearch && matchesStatus;
   });
 
   const toggleOrderSelection = (orderId: string) => {
@@ -218,42 +222,58 @@ return (
       </div>
     )}
 
-    {/* Debug Info */}
-
-
     {/* Filters */}
-<div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-  <div className="flex flex-col sm:flex-row gap-4">
-    {/* Search input */}
-    <div className="relative flex-1">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-      <input
-        type="text"
-        placeholder="Search by customer name, email, phone, or order ID..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-      />
+    <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* ID Search */}
+        <div className="relative w-full sm:w-48">
+          <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Order ID..."
+            value={idSearch}
+            onChange={(e) => setIdSearch(e.target.value)}
+            className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+          />
+          {idSearch && (
+            <button
+              onClick={() => setIdSearch('')}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              ×
+            </button>
+          )}
+        </div>
+
+        {/* Customer Search input */}
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search by customer name, email, or phone..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Status filter */}
+        <select
+          value={statusFilter}
+          onChange={(e) =>
+            setStatusFilter(e.target.value as Order['status'] | 'all')
+          }
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+        >
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="shipping">Shipping</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
     </div>
-
-    {/* Status filter */}
-    <select
-      value={statusFilter}
-      onChange={(e) =>
-        setStatusFilter(e.target.value as Order['status'] | 'all')
-      }
-      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-    >
-      <option value="all">All Status</option>
-      <option value="pending">Pending</option>
-      <option value="processing">Processing</option>
-      <option value="shipping">Shipping</option>
-      <option value="delivered">Delivered</option>
-      <option value="cancelled">Cancelled</option>
-    </select>
-  </div>
-</div>
-
 
     {/* Bulk Actions (Mobile) */}
     {selectedOrders.length > 0 && (
@@ -495,14 +515,24 @@ return (
           </span>
         )}
       </div>
-      {searchTerm && (
-        <button
-          onClick={() => setSearchTerm('')}
-          className="text-sky-600 hover:text-sky-800 self-start sm:self-auto"
-        >
-          Clear search
-        </button>
-      )}
+      <div className="flex space-x-4">
+        {idSearch && (
+          <button
+            onClick={() => setIdSearch('')}
+            className="text-sky-600 hover:text-sky-800"
+          >
+            Clear ID search
+          </button>
+        )}
+        {searchTerm && (
+          <button
+            onClick={() => setSearchTerm('')}
+            className="text-sky-600 hover:text-sky-800"
+          >
+            Clear search
+          </button>
+        )}
+      </div>
     </div>
   </div>
 );
