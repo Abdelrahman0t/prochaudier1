@@ -7,8 +7,11 @@ export interface Category {
   name: string;
   slug: string;
   parent: number | null;
+  image?: string | null;
+  image_url?: string | null;
   children?: Category[];
   count?: number;
+  product_count?: number;
 }
 
 export interface Tag {
@@ -309,10 +312,12 @@ private async request<T>(
     return this.request<Category[]>('/admin/categories/');
   }
 
-  async createCategory(categoryData: Partial<Category>): Promise<Category> {
+  async createCategory(categoryData: FormData | Partial<Category>): Promise<Category> {
+    const body = categoryData instanceof FormData ? categoryData : JSON.stringify(categoryData);
+    
     return this.request<Category>('/admin/categories/', {
       method: 'POST',
-      body: JSON.stringify(categoryData),
+      body,
     });
   }
 
@@ -320,19 +325,42 @@ private async request<T>(
     return this.request<Category[]>('/admin/categories2/');
   }
 
-  async createCategory2(categoryData: Partial<Category>): Promise<Category> {
+  async createCategory2(categoryData: FormData | Partial<Category>): Promise<Category> {
+    const body = categoryData instanceof FormData ? categoryData : JSON.stringify(categoryData);
+    
     return this.request<Category>('/admin/categories2/', {
       method: 'POST',
-      body: JSON.stringify(categoryData),
+      body,
     });
   }
 
-  async updateCategory(id: number, categoryData: Partial<Category>): Promise<Category> {
+async updateCategory(id: number, categoryData: FormData | Partial<Category>): Promise<Category> {
+  console.log('=== UPDATE CATEGORY API DEBUG ===');
+  console.log(`Updating category ID: ${id}`);
+  
+  if (categoryData instanceof FormData) {
+    console.log('Sending FormData:');
+    for (let [key, value] of categoryData.entries()) {
+      if (value instanceof File) {
+        console.log(`${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+      } else {
+        console.log(`${key}: ${value}`);
+      }
+    }
+    
+    // Send FormData directly - browser will set correct Content-Type with boundary
+    return this.request<Category>(`/admin/categories2/${id}/`, {
+      method: 'PUT',
+      body: categoryData,
+    });
+  } else {
+    console.log('Sending JSON:', categoryData);
     return this.request<Category>(`/admin/categories2/${id}/`, {
       method: 'PUT',
       body: JSON.stringify(categoryData),
     });
   }
+}
 
   async deleteCategory(id: number): Promise<void> {
     return this.request<void>(`/admin/categories2/${id}/`, {

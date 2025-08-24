@@ -626,4 +626,3 @@ const Bread = () => {
 };
 
 export default Bread;
-

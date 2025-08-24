@@ -25,7 +25,7 @@ const APropos = () => {
     },
     {
       icon: <Award className="h-8 w-8 text-purple-600" />,
-      title: "15 ans d'expérience",
+      title: "Expérience depuis 2023",
       description: "Spécialiste reconnu dans le domaine des pièces détachées pour chaudières depuis 2009."
     }
   ];
@@ -66,7 +66,7 @@ const APropos = () => {
       {/* Left Side Text */}
       <div className="max-w-xl">
         <span className="inline-block mb-4 px-4 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs sm:text-sm md:text-base font-medium">
-          15 ans d’expertise en chauffage
+          Expertise en chauffage depuis 2023
         </span>
         
         <h1 className="font-bold tracking-tight text-white mb-6 leading-tight text-[clamp(2rem,5vw,3.5rem)]">
@@ -146,9 +146,10 @@ const APropos = () => {
                 Notre mission
               </h2>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Chez Pro Chaudière, nous nous engageons à fournir des pièces détachées de qualité supérieure 
-                pour tous types de chaudières. Notre expertise de 15 ans nous permet de comprendre parfaitement 
-                les besoins de nos clients et de leur offrir des solutions adaptées.
+                Fort d’une expérience débutée en 2002 dans l’installation de chauffage,
+                 la plomberie et la réparation de chaudières, nous avons fondé Prochaudiere pour mettre ce savoir-faire au service de nos clients. 
+                 Basés à Alger, nous proposons des pièces détachées originales toutes marques, 
+                 un service après-vente agréé Facofri et un accompagnement technique fiable pour particuliers et professionnels.
               </p>
               <p className="text-muted-foreground mb-6 leading-relaxed">
                 Nous travaillons exclusivement avec des fabricants reconnus pour garantir l'authenticité 
@@ -336,14 +337,15 @@ const APropos = () => {
 
             <Card className="text-center p-6">
               <CardContent className="pt-6">
-                <MapPin className="h-8 w-8 text-brand-orange mx-auto mb-4" />
-                <h3 className="font-semibold text-foreground mb-2">Notre localisation</h3>
-                <p className="text-sm text-muted-foreground">Siège social</p>
-                <p className="text-sm text-muted-foreground">Zone industrielle</p>
-                <p className="text-sm text-muted-foreground">France</p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Livraison dans toute la France métropolitaine et DOM-TOM
-                </p>
+<MapPin className="h-8 w-8 text-brand-orange mx-auto mb-4" />
+<h3 className="font-semibold text-foreground mb-2">Notre localisation</h3>
+<p className="text-sm text-muted-foreground">Siège social</p>
+<p className="text-sm text-muted-foreground">Douera, Alger</p>
+<p className="text-sm text-muted-foreground">Algérie</p>
+<p className="text-xs text-muted-foreground mt-2">
+  92 Salem Madani, N°11 bis 01, RDC
+</p>
+
               </CardContent>
             </Card>
           </div>

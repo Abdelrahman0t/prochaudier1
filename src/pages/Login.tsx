@@ -328,6 +328,9 @@ const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   };
 
 
+  
+
+
 
 const handleRegisterSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -491,6 +494,31 @@ return (
               : "Rejoignez-nous et commencez votre aventure"}
           </p>
         </div>
+
+        <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+  <button
+    onClick={() => toggleMode(true)} // true for login
+    disabled={isLoading || redirecting}
+    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+      isLogin
+        ? 'bg-white text-cyan-600 shadow-sm'
+        : 'text-gray-600 hover:text-gray-800'
+    } disabled:opacity-50 disabled:cursor-not-allowed`}
+  >
+    Se connecter
+  </button>
+  <button
+    onClick={() => toggleMode(false)} // false for register
+    disabled={isLoading || redirecting}
+    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+      !isLogin
+        ? 'bg-white text-cyan-600 shadow-sm'
+        : 'text-gray-600 hover:text-gray-800'
+    } disabled:opacity-50 disabled:cursor-not-allowed`}
+  >
+    S'inscrire
+  </button>
+</div>
 
         {/* Success Message */}
         {success && (
@@ -694,34 +722,45 @@ return (
               </button>
             </div>
           )}
+                      <div className="mb-5 sm:mb-6 mt-5 w-full">
+              <GoogleLogin onLoginSuccess={handleGoogleSuccess} />
+            </div>
         </div>
 
         {/* Divider */}
         {!redirecting && (
           <>
+          
             <div className="flex items-center gap-4 my-5 sm:my-6">
+              
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+              
               <span className="text-gray-500 text-sm font-medium px-2">ou</span>
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
             </div>
 
             {/* Google Login */}
-            <div className="mb-5 sm:mb-6">
-              <GoogleLogin onLoginSuccess={handleGoogleSuccess} />
-            </div>
+
+
+
 
             {/* Toggle */}
-            <div className="text-center">
-              <p className="text-gray-600 text-sm leading-relaxed">
-                {isLogin ? "Vous n'avez pas de compte ?" : "Vous avez déjà un compte ?"}
-                <button
-                  onClick={toggleMode}
-                  className="ml-2 text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors"
-                >
-                  {isLogin ? "Inscrivez-vous ici" : "Connectez-vous ici"}
-                </button>
-              </p>
-            </div>
+
+
+            {!redirecting && (
+  <div className="mt-5 sm:mt-6">
+    <button
+      onClick={() => navigate('/')}
+      disabled={isLoading}
+      className="w-full py-3 sm:py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] text-sm sm:text-base flex items-center justify-center gap-2"
+    >
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7-7h14a7 7 0 00-7-7z" />
+      </svg>
+      Continuer en tant qu'invité
+    </button>
+  </div>
+)}
           </>
         )}
       </div>

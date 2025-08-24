@@ -9,27 +9,21 @@ import ContactUs from "./pages/ContactUs";
 import APropos from "./pages/APropos";
 import CheckoutPage from './pages/CheckOut'
 import Categories from './pages/Democate'
-import Cate from './pages/CategoryPage'
-
+import Cate from './pages/CategoryPage' 
 import CategoryBrandsPage from './pages/ShowBrands'
 import Allbrands from './pages/Allbrands'
 import Bread from './pages/bread'
-
-
+import Results from './pages/SearchResults' 
+import SearchResults from './pages/SearchResults' // Add this import for the search results page
 import Login from './pages/Login'
 import Register from './pages/register'
 import Profile from './pages/Profile'
-import Admin from "./pages/Admin";
-
-
-
-
-
+import Admin from "./pages/Admin";     
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
-import CartSidebar from "./components/CartSidebar";
+import CartSidebar from "./components/CartSidebar"; 
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient(); 
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -42,29 +36,22 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/products" element={<Products />} />
           <Route path="/breadProduct" element={<Bread />} />
-
           <Route path="/contactus" element={<ContactUs />} />
           <Route path="/CheckOut" element={<CheckoutPage />} />
           <Route path="/democate" element={<Categories />} />
           <Route path="/allbrands" element={<Allbrands />} />
-
           <Route path="/CategoryPage" element={<Cate />} />
-
           <Route path="/category/:slug/brands" element={<CategoryBrandsPage />} />
-
-
           <Route path="/Apropos" element={<APropos />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Register" element={<Register />} />
           <Route path="/Profile" element={<Profile />} />
-          
-
-
-
           <Route path="/Admin" element={<Admin />} />
-
-
           <Route path="/product/:id" element={<ProductDetail />} />
+          
+          {/* Search Results Route - Add this line */}
+          <Route path="/search" element={<SearchResults />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
