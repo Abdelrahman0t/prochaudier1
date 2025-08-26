@@ -52,6 +52,10 @@ const SearchResults = () => {
   const { toast } = useToast();
 
   // Fetch search results
+    useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   const fetchSearchResults = async (query) => {
     if (!query.trim()) return;
     

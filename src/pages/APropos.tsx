@@ -75,8 +75,9 @@ const APropos = () => {
         </h1>
         
         <p className="text-white/80 mb-8 leading-relaxed text-[clamp(1rem,2.5vw,1.25rem)]">
-          Pro Chaudière est votre partenaire de confiance pour toutes les marques.  
-          Nos pièces sont 100% originales, testées, et prêtes à redonner vie à votre installation.
+          Depuis 2023, Prochaudiere met son savoir-faire au service du chauffage.
+Pièces détachées de chaudières, livrées rapidement et garanties.
+Partenaire de confiance pour toutes les marques, nous vous proposons des pièces 100% originales, testées et prêtes à redonner vie à votre installation.
         </p>
         
 {/* Buttons */}

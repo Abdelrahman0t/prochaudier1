@@ -253,6 +253,9 @@ const Bread = () => {
   // Enhanced loading states
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+      useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
 
   // Load categories AND initialize filters from URL in one effect
   useEffect(() => {
@@ -393,9 +396,7 @@ const Bread = () => {
   };
 
   // Scroll to top on mount
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+
 
   // Show full loading page on initial load
   if (!isInitialized) {
