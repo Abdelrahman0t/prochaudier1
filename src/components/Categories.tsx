@@ -1,92 +1,74 @@
-// ADD THIS LINE INSTEAD
-import { Wrench, Cpu, Droplets, Waves, GitBranch, Radar, ArrowLeftRight, Fan, ShieldCheck } from 'lucide-react';
+import { Wrench } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from 'react-router-dom';
 
 const Categories = () => {
   const navigate = useNavigate();
   
-const categories = [
-  {
-    name: "Carte électronique",
-    slug: "carte-electronique",
-    count: "17 produits",
-    icon: Cpu, // Better represents electronic circuit boards/processors
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-  },
-  {
-    name: "Modules Hydrauliques",
-    slug: "modules-hydrauliques",
-    count: "24 produits",
-    icon: Droplets, // Perfect for hydraulic systems
-    color: "text-cyan-600",
-    bgColor: "bg-cyan-50",
-  },
-  {
-    name: "Pompe",
-    slug: "pompe",
-    count: "19 produits",
-    icon: Waves, // Better represents fluid pumping and water flow
-    color: "text-green-600",
-    bgColor: "bg-green-50",
-  },
-  {
-    name: "Vannes 3 voies",
-    slug: "vannes-3-voies",
-    count: "16 produits",
-    icon: GitBranch, // Visual representation of 3-way flow splitting
-    color: "text-orange-600",
-    bgColor: "bg-orange-50",
-  },
-  {
-    name: "Capteur",
-    slug: "capteur",
-    count: "11 produits",
-    icon: Radar, // Better represents sensors and detection
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-  },
-  {
-    name: "ÉCHANGEURS",
-    slug: "echangeurs",
-    count: "15 produits",
-    icon: ArrowLeftRight, // Represents heat/energy exchange process
-    color: "text-red-600",
-    bgColor: "bg-red-50",
-  },
-  {
-    name: "Ventilateurs chaudière",
-    slug: "ventilateurs-chaudiere",
-    count: "7 produits",
-    icon: Fan, // Perfect icon for ventilation fans
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-50",
-  },
-  {
-    name: "Soupape chaudière",
-    slug: "soupape-chaudiere",
-    count: "6 produits",
-    icon: ShieldCheck, // Emphasizes safety valve protection
-    color: "text-pink-600",
-    bgColor: "bg-pink-50",
-  },
-];
+  const categories = [
+    {
+      name: "Carte électronique",
+      slug: "carte-electronique",
+      count: "17 produits",
+      image: "/cate_icones/motherboard.png",
+
+    },
+    {
+      name: "Modules Hydrauliques",
+      slug: "modules-hydrauliques",
+      count: "24 produits",
+      image: "/cate_icones/hydraulic-energy.png",
+
+    },
+    {
+      name: "Pompe",
+      slug: "pompe",
+      count: "19 produits",
+      image: "/cate_icones/revolve.png",
+
+    },
+    {
+      name: "Vannes 3 voies",
+      slug: "vannes-3-voies",
+      count: "16 produits",
+      image: "/cate_icones/pipe.png",
+
+    },
+    {
+      name: "Capteur",
+      slug: "capteur",
+      count: "11 produits",
+      image: "/cate_icones/temperature-sensor.png",
+
+    },
+    {
+      name: "ÉCHANGEURS",
+      slug: "echangeurs",
+      count: "15 produits",
+      image: "/cate_icones/data.png",
+
+    },
+    {
+      name: "Ventilateurs chaudière",
+      slug: "ventilateurs-chaudiere",
+      count: "7 produits",
+      image: "/cate_icones/fan.png",
+
+    },
+    {
+      name: "Soupape chaudière",
+      slug: "soupape-chaudiere",
+      count: "6 produits",
+      image: "/cate_icones/pressure-gauge.png",
+    // pink-600
+
+    },
+  ];
 
   const handleCategoryClick = (category) => {
-    // Navigate to products page with categories parameter (plural)
     navigate(`/products?categories=${category.slug}`);
   };
 
-  const handleClick = () => {
-    const isMobile = window.innerWidth < 1024; // lg breakpoint
-    if (isMobile) {
-      navigate('/products?openFilters=true');
-    } else {
-      navigate('/products');
-    }
-  };
-  
   return (
     <section id="categories" className="py-20 bg-gradient-subtle">
       <div className="container mx-auto px-4">
@@ -101,31 +83,36 @@ const categories = [
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((category, index) => {
-            const IconComponent = category.icon;
-            return (
-              <Card
-                key={category.name}
-                className="group cursor-pointer border-0 shadow-md hover:shadow-xl transition-all duration-300 hover-lift bg-white/80 backdrop-blur-sm"
-                style={{ animationDelay: `${index * 0.1}s` }}
-                onClick={() => handleCategoryClick(category)}
-              >
-                <CardContent className="p-6 text-center">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${category.bgColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className={`h-8 w-8 ${category.color}`} />
-                  </div>
-                  
-                  <h3 className="font-semibold text-lg mb-2 group-hover:text-brand transition-colors">
-                    {category.name}
-                  </h3>
-                  
-                  <p className="text-muted-foreground text-sm">
-                    {category.count}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {categories.map((category, index) => (
+            <Card
+              key={category.name}
+              className="group cursor-pointer border-0 shadow-md hover:shadow-xl transition-all duration-300 hover-lift bg-white/80 backdrop-blur-sm"
+              style={{ animationDelay: `${index * 0.1}s` }}
+              onClick={() => handleCategoryClick(category)}
+            >
+              <CardContent className="p-6 text-center">
+                <div
+                  className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300"
+                  style={{ backgroundColor: category.bgColor }}
+                >
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="h-16 w-16 object-contain"
+                    style={{ filter: `drop-shadow(0 0 2px ${category.color})` }}
+                  />
+                </div>
+                
+                <h3 className="font-semibold text-lg mb-2 group-hover:text-brand transition-colors">
+                  {category.name}
+                </h3>
+                
+                <p className="text-muted-foreground text-sm">
+                  {category.count}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <div className="text-center mt-12">
