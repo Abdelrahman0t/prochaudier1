@@ -33,6 +33,10 @@ const ProductDetail = () => {
   const [lastPointerPos, setLastPointerPos] = useState({ x: 0, y: 0 });
   const imageContainerRef = useRef(null);
 
+        useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+
   // Check if device is mobile
   useEffect(() => {
     const checkMobile = () => {
