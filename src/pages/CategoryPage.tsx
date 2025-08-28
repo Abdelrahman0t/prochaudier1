@@ -210,7 +210,7 @@ const topRef = useRef(null);
                   <div className="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 flex items-center justify-center bg-gray-50 rounded overflow-hidden">
                     {tag.image_url ? (
                       <img
-                        src={tag.image_url}
+                        src={import.meta.env.VITE_API_BASE_URL + tag.image_url}
                         alt={tag.name}
                         className="max-w-full max-h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity"
                         onError={(e) => {
@@ -514,5 +514,6 @@ const topRef = useRef(null);
     </div>
   );
 };
+
 
 export default CategoryPage;
