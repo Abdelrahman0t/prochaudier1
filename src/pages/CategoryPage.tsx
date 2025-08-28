@@ -209,6 +209,7 @@ const topRef = useRef(null);
                 <div className="flex flex-col items-center space-y-1.5 sm:space-y-1">
                   <div className="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 flex items-center justify-center bg-gray-50 rounded overflow-hidden">
                     {tag.image_url ? (
+                <p>tag.image_url</p>
                       <img
                         src={import.meta.env.VITE_API_BASE_URL + tag.image_url}
                         alt={tag.name}
@@ -517,3 +518,4 @@ const topRef = useRef(null);
 
 
 export default CategoryPage;
+
