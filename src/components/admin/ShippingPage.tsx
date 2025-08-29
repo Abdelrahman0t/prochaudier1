@@ -117,7 +117,7 @@ const ShippingSettingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
@@ -128,7 +128,7 @@ const ShippingSettingsPage: React.FC = () => {
             <MapPin className="w-8 h-8 text-sky-500" />
           </div>
         </div>
-       
+
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -152,6 +152,7 @@ const ShippingSettingsPage: React.FC = () => {
           </div>
         </div>
       </div>
+       */}
 
       {/* Error Display */}
       {error && (
@@ -268,6 +269,4 @@ const ShippingSettingsPage: React.FC = () => {
   );
 };
 
-
 export default ShippingSettingsPage;
-
