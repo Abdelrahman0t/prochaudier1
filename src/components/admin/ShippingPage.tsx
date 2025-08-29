@@ -128,15 +128,7 @@ const ShippingSettingsPage: React.FC = () => {
             <MapPin className="w-8 h-8 text-sky-500" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Average Price</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">{averagePrice} DA</p>
-            </div>
-            <Truck className="w-8 h-8 text-green-500" />
-          </div>
-        </div>
+       
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -278,3 +270,4 @@ const ShippingSettingsPage: React.FC = () => {
 
 
 export default ShippingSettingsPage;
+
