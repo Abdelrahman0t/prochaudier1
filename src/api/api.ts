@@ -88,6 +88,12 @@ export interface Order {
   items: OrderItem[];
 }
 
+export interface Wilaya {
+  id: number;
+  name: string;
+  price: number;
+}
+
 // Response types for filtering endpoints
 export interface ProductsResponse {
   products: Product[];
@@ -412,6 +418,37 @@ async updateTag(id: number, tagData: FormData | { name: string; slug: string; im
       body: JSON.stringify({ status }),
     });
   }
+
+
+
+   async getWilayas(): Promise<Wilaya[]> {
+    return this.request<Wilaya[]>('/wilayas/');
+  }
+
+  async getWilayasAdmin(): Promise<Wilaya[]> {
+    return this.request<Wilaya[]>('/admin/wilayas/');
+  }
+
+  async createWilaya(wilayaData: { name: string; price: number }): Promise<Wilaya> {
+    return this.request<Wilaya>('/admin/wilayas/', {
+      method: 'POST',
+      body: JSON.stringify(wilayaData),
+    });
+  }
+
+  async updateWilaya(id: number, wilayaData: { name?: string; price?: number }): Promise<Wilaya> {
+    return this.request<Wilaya>(`/admin/wilayas/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(wilayaData),
+    });
+  }
+
+  async deleteWilaya(id: number): Promise<void> {
+    return this.request<void>(`/admin/wilayas/${id}/`, {
+      method: 'DELETE',
+    });
+  }
+  
 }
 
 // Export singleton instance

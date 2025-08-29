@@ -493,7 +493,10 @@ const Bread = () => {
                       <div className="flex justify-between items-end w-full">
                         <div className="space-y-0.5 sm:space-y-1">
                           <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-brand">
-                            {product.price && product.price !== 0 ? product.price + ' DZD' : 'Prix non disponible'} 
+                            {product.price && !isNaN(product.price) && Number(product.price) > 0 
+  ? product.price + ' DZD' 
+  : 'Prix non disponible'}
+ 
                           </p>
                           <p className="text-[10px] sm:text-xs font-medium">
                             {product.stock_status == 'outofstock' ? (
@@ -513,18 +516,23 @@ const Bread = () => {
                         </Button>
                       </div>
 
-                      <Button 
-                        onClick={() => handleAddToCart(product)}
-                        size="sm"
-                        className="w-full text-xs sm:text-sm h-7 sm:h-8 md:h-9"
-                        disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'}
-                      >
-                        <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        <span className="truncate">
-                          {!product.price || product.price === 0 ? "Indisponible" : 
-                           product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock' ? "Rupture de stock" : "Ajouter au panier"}
-                        </span>
-                      </Button>
+<Button 
+  onClick={() => handleAddToCart(product)}
+  size="sm"
+  className="w-full max-[1200px]:text-xs max-[559px]:text-sm max-[559px]:h-8 max-[425px]:text-xs max-[425px]:h-7"
+  disabled={
+    !product.price || isNaN(product.price) || Number(product.price) <= 0 || 
+    product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'
+  }
+>
+  <ShoppingCart className="h-4 w-4 mr-2 max-[1200px]:mr-0 max-[559px]:mr-1.5 max-[425px]:h-3.5 max-[425px]:w-3.5 max-[425px]:mr-1" />
+  {!product.price || isNaN(product.price) || Number(product.price) <= 0
+    ? "Indisponible"
+    : product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'
+      ? "Rupture de stock"
+      : "Ajouter au panier"}
+</Button>
+
                     </CardFooter>
                   </Card>
                 ))}

@@ -11,7 +11,7 @@ const APropos = () => {
     {
       icon: <Truck className="h-8 w-8 text-blue-600" />,
       title: "Livraison rapide",
-      description: "Expédition sous 24h pour tous les produits en stock. Livraison gratuite dès 150€ d'achat."
+      description: "Expédition sous 24h pour tous les produits en stock. Livraison gratuite dès 150DZD d'achat."
     },
     {
       icon: <Shield className="h-8 w-8 text-cyan-600" />,

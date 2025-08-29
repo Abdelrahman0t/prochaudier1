@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Plus, Minus, ShoppingCart, Heart, Share2, Star, ZoomIn, ZoomOut, ExternalLink, RotateCcw, Tag, Folder } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +24,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
-  
+  const location = useLocation();
   // Advanced zoom and pan state
   const [scale, setScale] = useState(1);
   const [translateX, setTranslateX] = useState(0);
@@ -32,11 +32,9 @@ const ProductDetail = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [lastPointerPos, setLastPointerPos] = useState({ x: 0, y: 0 });
   const imageContainerRef = useRef(null);
-
-        useEffect(() => {
+      useEffect(() => {
       window.scrollTo(0, 0);
     }, []);
-
   // Check if device is mobile
   useEffect(() => {
     const checkMobile = () => {
@@ -296,8 +294,14 @@ const ProductDetail = () => {
             <h1 className="text-2xl font-bold text-foreground mb-4">
               {error || "Produit non trouvé"}
             </h1>
-            <Button onClick={() => navigate('/products')}>
-              Retour aux produits
+            <Button onClick={() => {
+  if (window.history.length > 1) {
+    navigate(-1);
+  } else {
+    navigate('/products');
+  }
+}}>
+              Retour
             </Button>
           </div>
         </div>
@@ -351,11 +355,17 @@ const ProductDetail = () => {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => navigate('/products')}
+            onClick={() => {
+  if (window.history.length > 1) {
+    navigate(-1);
+  } else {
+    navigate('/products');
+  }
+}}
             className="p-0 h-auto text-xs sm:text-sm md:text-base"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Retour aux produits
+            Retour 
           </Button>
           <span>/</span>
           {product.categories && product.categories.length > 0 && (

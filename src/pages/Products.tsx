@@ -752,7 +752,9 @@ const handleTagToggle = (tag) => {
                     <div className="flex justify-between items-end w-full">
                       <div className="space-y-1 max-[559px]:space-y-0.5">
                         <p className="text-2xl max-[1469px]:text-lg font-bold text-brand max-[1200px]:text-lg max-[559px]:text-lg max-[425px]:text-base">
-                          {product.price && product.price !== 0 ? product.price + ' DZD' : 'Prix non disponible'} 
+                          {product.price && !isNaN(product.price) && Number(product.price) > 0 
+  ? product.price + ' DZD' 
+  : 'Prix non disponible'}
                         </p>
                         <p className="text-xs font-medium max-[559px]:text-[11px]">
                           {product.stock_status == 'outofstock' ? (
@@ -772,16 +774,23 @@ const handleTagToggle = (tag) => {
                       </Button>
                     </div>
 
-                    <Button 
-                      onClick={() => handleAddToCart(product)}
-                      size="sm"
-                      className="w-full max-[1200px]:text-xs max-[559px]:text-sm max-[559px]:h-8 max-[425px]:text-xs max-[425px]:h-7"
-                      disabled={!product.price || product.price === 0 || product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'}
-                    >
-                      <ShoppingCart className="h-4 w-4 mr-2 max-[1200px]:mr-0 max-[559px]:mr-1.5 max-[425px]:h-3.5 max-[425px]:w-3.5 max-[425px]:mr-1" />
-                      {!product.price || product.price === 0 ? "Indisponible" : 
-                       product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock' ? "Rupture de stock" : "Ajouter au panier"}
-                    </Button>
+<Button 
+  onClick={() => handleAddToCart(product)}
+  size="sm"
+  className="w-full max-[1200px]:text-xs max-[559px]:text-sm max-[559px]:h-8 max-[425px]:text-xs max-[425px]:h-7"
+  disabled={
+    !product.price || isNaN(product.price) || Number(product.price) <= 0 || 
+    product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'
+  }
+>
+  <ShoppingCart className="h-4 w-4 mr-2 max-[1200px]:mr-0 max-[559px]:mr-1.5 max-[425px]:h-3.5 max-[425px]:w-3.5 max-[425px]:mr-1" />
+  {!product.price || isNaN(product.price) || Number(product.price) <= 0
+    ? "Indisponible"
+    : product.stock === 0 || product.in_stock === false || product.stock_status === 'outofstock'
+      ? "Rupture de stock"
+      : "Ajouter au panier"}
+</Button>
+
                   </CardFooter>
                 </Card>
               ))}

@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../components/admin/AdminLayout';
 import DashboardPage from '../components/admin/DashboardPage';
 import OrdersPage from '../components/admin/OrdersPage';
+import ShippingPage from '@/components/admin/ShippingPage';
+
+import ShippingModal from '@/components/admin/Shippingmodal';
 import ProductsPage from '../components/admin/ProductsPage';
 import CategoriesPage from '../components/admin/CategoriesPage';
 import BrandsPage from '../components/admin/BrandsPage';
@@ -352,73 +355,73 @@ useEffect(() => {
     setSelectedOrder(order);
   };
 
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-
-      case 'orders':
-        return (
-          <OrdersPage
-            orders={orders}
-            onViewOrder={handleViewOrder}
-            onUpdateOrderStatus={handleUpdateOrderStatus}
-          />
-        );
-      case 'products':
-        return (
-          <ProductsPage
-            products={products}
-            categories={categories}
-            brands={brands}
-            onCreateProduct={handleCreateProduct}
-            onUpdateProduct={handleUpdateProduct}
-            onDeleteProduct={handleDeleteProduct}
-          />
-        );
-      case 'categories':
-        return (
-          <CategoriesPage
-            categories={categories}
-            onCreateCategory={handleCreateCategory}
-            onUpdateCategory={handleUpdateCategory}
-            onDeleteCategory={handleDeleteCategory}
-          />
-        );
-      case 'brands':
-        return (
-          <BrandsPage
-            brands={brands}
-            onCreateBrand={handleCreateBrand}
-            onUpdateBrand={handleUpdateBrand}
-            onDeleteBrand={handleDeleteBrand}
-          />
-        );
-      case 'users':
-        {/* 
-        return (
-          <UsersPage
-            users={users}
-            onUpdateUser={handleUpdateUser}
-          />
-        );
-        */}
-
-                return (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Users</h2>
-            <p className="text-gray-600">Users page coming soon...</p>
-          </div>
-        );
-      case 'settings':
-        return (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Settings</h2>
-            <p className="text-gray-600">Settings page coming soon...</p>
-          </div>
-        );
-      default:
-        return <DashboardPage stats={dashboardStats} />;
-    }
-  };
+const renderCurrentPage = () => {
+  switch (currentPage) {
+    case 'orders':
+      return (
+        <OrdersPage
+          orders={orders}
+          onViewOrder={handleViewOrder}
+          onUpdateOrderStatus={handleUpdateOrderStatus}
+        />
+      );
+    case 'products':
+      return (
+        <ProductsPage
+          products={products}
+          categories={categories}
+          brands={brands}
+          onCreateProduct={handleCreateProduct}
+          onUpdateProduct={handleUpdateProduct}
+          onDeleteProduct={handleDeleteProduct}
+        />
+      );
+    case 'categories':
+      return (
+        <CategoriesPage
+          categories={categories}
+          onCreateCategory={handleCreateCategory}
+          onUpdateCategory={handleUpdateCategory}
+          onDeleteCategory={handleDeleteCategory}
+        />
+      );
+    case 'brands':
+      return (
+        <BrandsPage
+          brands={brands}
+          onCreateBrand={handleCreateBrand}
+          onUpdateBrand={handleUpdateBrand}
+          onDeleteBrand={handleDeleteBrand}
+        />
+      );
+    case 'shipping':
+      return <ShippingPage />;
+    case 'users':
+      {/*
+       return (
+         <UsersPage
+           users={users}
+           onUpdateUser={handleUpdateUser}
+         />
+       );
+       */}
+      return (
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Users</h2>
+          <p className="text-gray-600">Users page coming soon...</p>
+        </div>
+      );
+    case 'settings':
+      return (
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Settings</h2>
+          <p className="text-gray-600">Settings page coming soon...</p>
+        </div>
+      );
+    default:
+      return <DashboardPage stats={dashboardStats} />;
+  }
+};
 
   return (
     <div className="App">

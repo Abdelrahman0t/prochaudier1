@@ -107,22 +107,28 @@ const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [deliveryMethod, setDeliveryMethod] = useState('standard');
 
-  const deliveryOptions = [
-    {
-      id: 'standard',
-      name: 'Livraison Standard',
-      description: '3-5 jours ouvrables',
-      price: 0,
-      icon: <Truck className="w-5 h-5" />
-    },
-    {
-      id: 'express',
-      name: 'Livraison Express',
-      description: '1-2 jours ouvrables',
-      price: 15,
-      icon: <Truck className="w-5 h-5" />
+const [wilayas, setWilayas] = useState([]);
+const [selectedWilayaPrice, setSelectedWilayaPrice] = useState(0);
+const [loadingWilayas, setLoadingWilayas] = useState(false);
+
+const fetchWilayas = async () => {
+  setLoadingWilayas(true);
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}api/wilayas/`);
+    if (response.ok) {
+      const data = await response.json();
+      setWilayas(data);
     }
-  ];
+  } catch (error) {
+    console.error('Error fetching wilayas:', error);
+  } finally {
+    setLoadingWilayas(false);
+  }
+};
+
+useEffect(() => {
+  fetchWilayas();
+}, []);
 
   const paymentMethods = [
     {
@@ -143,11 +149,11 @@ const navigate = useNavigate();
 
   const total = getTotalPrice();
   const itemCount = getTotalItems();
-  const deliveryPrice = deliveryOptions.find(opt => opt.id === deliveryMethod)?.price || 0;
+  const deliveryPrice = selectedWilayaPrice;
   const finalTotal = total + deliveryPrice;
 
   const formatPrice = (price) => {
-    return `${price.toFixed(2)}€`;
+    return `${price.toFixed(2)} DZD`;
   };
 
   const handleCustomerInfoChange = (field, value) => {
@@ -211,7 +217,7 @@ const navigate = useNavigate();
           name: item.name
         })),
         payment_method: paymentMethod,
-        delivery_method: deliveryMethod,
+        delivery_method: 'standard',
         subtotal: total,
         delivery_price: deliveryPrice,
         total: finalTotal
@@ -376,16 +382,10 @@ const OrderSummary = ({ isMobile = false }) => (
           <span className="text-gray-600">Sous-total ({itemCount} articles)</span>
           <span>{formatPrice(total)}</span>
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Livraison</span>
-          <span>
-            {deliveryPrice === 0 ? (
-              <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">Gratuite</span>
-            ) : (
-              formatPrice(deliveryPrice)
-            )}
-          </span>
-        </div>
+<div className="flex justify-between text-sm">
+  <span className="text-gray-600">Livraison</span>
+  <span>{formatPrice(deliveryPrice)}</span>
+</div>
         <hr className="border-gray-200" />
         <div className="flex justify-between font-semibold text-base sm:text-lg">
           <span>Total</span>
@@ -623,60 +623,25 @@ const OrderSummary = ({ isMobile = false }) => (
   <Label htmlFor="region">Wilaya *</Label>
   <Select
     value={shippingInfo.region}
-    onValueChange={(value) => handleShippingInfoChange('region', value)}
+    onValueChange={(value) => {
+      handleShippingInfoChange('region', value);
+      const selectedWilaya = wilayas.find(w => w.name.toLowerCase().replace(/\s+/g, '-') === value);
+      setSelectedWilayaPrice(selectedWilaya ? parseFloat(selectedWilaya.price) : 0);
+    }}
+    disabled={loadingWilayas}
   >
     <SelectTrigger>
-      <SelectValue placeholder="Choisir la wilaya" />
+      <SelectValue placeholder={loadingWilayas ? "Chargement..." : "Choisir la wilaya"} />
     </SelectTrigger>
     <SelectContent>
-      <SelectItem value="adrar">Adrar</SelectItem>
-      <SelectItem value="ain-defla">Ain Defla</SelectItem>
-      <SelectItem value="ain-temouchent">Ain Temouchent</SelectItem>
-      <SelectItem value="algiers">Alger</SelectItem>
-      <SelectItem value="annaba">Annaba</SelectItem>
-      <SelectItem value="batna">Batna</SelectItem>
-      <SelectItem value="bechar">Bechar</SelectItem>
-      <SelectItem value="bejaia">Bejaia</SelectItem>
-      <SelectItem value="biskra">Biskra</SelectItem>
-      <SelectItem value="blida">Blida</SelectItem>
-      <SelectItem value="bordj-bou-arreridj">Bordj Bou Arreridj</SelectItem>
-      <SelectItem value="bouira">Bouira</SelectItem>
-      <SelectItem value="boumerdes">Boumerdes</SelectItem>
-      <SelectItem value="chlef">Chlef</SelectItem>
-      <SelectItem value="constantine">Constantine</SelectItem>
-      <SelectItem value="djelfa">Djelfa</SelectItem>
-      <SelectItem value="el-bayadh">El Bayadh</SelectItem>
-      <SelectItem value="el-oued">El Oued</SelectItem>
-      <SelectItem value="el-tarf">El Tarf</SelectItem>
-      <SelectItem value="ghardaia">Ghardaia</SelectItem>
-      <SelectItem value="guelma">Guelma</SelectItem>
-      <SelectItem value="illizi">Illizi</SelectItem>
-      <SelectItem value="jijel">Jijel</SelectItem>
-      <SelectItem value="khenchela">Khenchela</SelectItem>
-      <SelectItem value="laghouat">Laghouat</SelectItem>
-      <SelectItem value="mascara">Mascara</SelectItem>
-      <SelectItem value="medea">Medea</SelectItem>
-      <SelectItem value="mila">Mila</SelectItem>
-      <SelectItem value="mostaganem">Mostaganem</SelectItem>
-      <SelectItem value="msila">Msila</SelectItem>
-      <SelectItem value="naama">Naama</SelectItem>
-      <SelectItem value="oran">Oran</SelectItem>
-      <SelectItem value="ouargla">Ouargla</SelectItem>
-      <SelectItem value="oum-el-bouaghi">Oum El Bouaghi</SelectItem>
-      <SelectItem value="relizane">Relizane</SelectItem>
-      <SelectItem value="saida">Saida</SelectItem>
-      <SelectItem value="setif">Setif</SelectItem>
-      <SelectItem value="sidi-bel-abbes">Sidi Bel Abbes</SelectItem>
-      <SelectItem value="skikda">Skikda</SelectItem>
-      <SelectItem value="soukahras">Souk Ahras</SelectItem>
-      <SelectItem value="tamanrasset">Tamanrasset</SelectItem>
-      <SelectItem value="tebessa">Tebessa</SelectItem>
-      <SelectItem value="tindouf">Tindouf</SelectItem>
-      <SelectItem value="tipaza">Tipaza</SelectItem>
-      <SelectItem value="tissemsilt">Tissemsilt</SelectItem>
-      <SelectItem value="tizi-ouzou">Tizi Ouzou</SelectItem>
-      <SelectItem value="tiaret">Tiaret</SelectItem>
-      <SelectItem value="tlemcen">Tlemcen</SelectItem>
+      {wilayas.map((wilaya) => (
+        <SelectItem 
+          key={wilaya.id} 
+          value={wilaya.name.toLowerCase().replace(/\s+/g, '-')}
+        >
+          {wilaya.name} - {formatPrice(parseFloat(wilaya.price))}
+        </SelectItem>
+      ))}
     </SelectContent>
   </Select>
 </div>
@@ -694,37 +659,7 @@ const OrderSummary = ({ isMobile = false }) => (
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Options de livraison</CardTitle>
-                <CardDescription>Choisissez votre mode de livraison</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup value={deliveryMethod} onValueChange={setDeliveryMethod}>
-                  {deliveryOptions.map((option) => (
-                    <div key={option.id} className="flex items-center space-x-3 p-4 border rounded-lg">
-                      <RadioGroupItem value={option.id} id={option.id} />
-                      <div className="flex items-center gap-3 flex-1">
-                        {option.icon}
-                        <div className="flex-1">
-                          <Label htmlFor={option.id} className="font-medium cursor-pointer">
-                            {option.name}
-                          </Label>
-                          <p className="text-sm text-muted-foreground">{option.description}</p>
-                        </div>
-                        <div className="text-right">
-                          {option.price === 0 ? (
-                            <Badge variant="secondary">Gratuit</Badge>
-                          ) : (
-                            <span className="font-semibold">{formatPrice(option.price)}</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </CardContent>
-            </Card>
+
           </div>
         );
 
@@ -837,10 +772,10 @@ const OrderSummary = ({ isMobile = false }) => (
               <span className="text-gray-600">Mode de paiement:</span>
               <span className="font-medium">Paiement à la livraison</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Livraison:</span>
-              <span className="font-medium">{deliveryOptions.find(opt => opt.id === deliveryMethod)?.name}</span>
-            </div>
+<div className="flex justify-between">
+  <span className="text-gray-600">Livraison:</span>
+  <span className="font-medium">{formatPrice(deliveryPrice)}</span>
+</div>
             <div className="flex justify-between items-center py-2 border-t">
               <span className="font-semibold">Total:</span>
               <span className="font-bold text-lg text-blue-600">{formatPrice(finalTotal)}</span>

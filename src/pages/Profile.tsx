@@ -111,7 +111,7 @@ const ProfilePage = () => {
   };
 
   const formatPrice = (price) => {
-    return `€${parseFloat(price).toFixed(2)}`;
+    return `DZD ${parseFloat(price).toFixed(2)}`;
   };
 
   const getStatusColor = (status) => {
