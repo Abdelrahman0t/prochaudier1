@@ -15,7 +15,7 @@ const Categories = () => {
     },
     {
       name: "Modules Hydrauliques",
-      slug: "modules-hydrauliques",
+      slug: "modules-hydraulyques",
       count: "24 produits",
       image: "/cate_icones/hydraulic-energy.png",
 
@@ -66,7 +66,7 @@ const Categories = () => {
   ];
 
   const handleCategoryClick = (category) => {
-    navigate(`/products?categories=${category.slug}`);
+    navigate(`/breadProduct?categories=${category.slug}`);
   };
 
   return (

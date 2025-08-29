@@ -6,7 +6,7 @@ const WhyChooseUs = () => {
     {
       icon: Truck,
       title: "Livraison rapide",
-      description: "Expédition sous 24h pour tous les produits en stock. Livraison gratuite dès 150€ d'achat.",
+      description: "Expédition sous 24h pour tous les produits en stock. Livraison gratuite dès 150DZD d'achat.",
       color: "text-blue-600",
       bgColor: "bg-blue-50",
     },

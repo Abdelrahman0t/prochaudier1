@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   LogOut,
-  Home
+  Home,
+  Truck
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -28,6 +29,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage, onPage
    // { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'orders', label: 'Orders', icon: ShoppingBag },
     { id: 'products', label: 'Products', icon: Package },
+    { id: 'shipping', label: 'Shipping', icon: Truck }, // Added shipping
     { id: 'categories', label: 'Categories', icon: Tag },
     { id: 'brands', label: 'Brands', icon: Home },
     { id: 'users', label: 'Users', icon: Users },
@@ -106,7 +108,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage, onPage
               <Menu className="w-5 h-5" />
             </button>
             <h2 className="text-lg font-semibold text-gray-800 capitalize">
-              {currentPage}
+              {currentPage === 'shipping' ? 'Shipping Settings' : currentPage}
             </h2>
             <div className="flex items-center space-x-4">
               <div className="text-right">

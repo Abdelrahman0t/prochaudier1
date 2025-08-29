@@ -1,28 +1,35 @@
-import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import { FaTiktok, FaLinkedin } from 'react-icons/fa';
+import { useNavigate, Link } from 'react-router-dom';
+
 const Footer = () => {
+  const navigate = useNavigate();
+
   const quickLinks = [
     { name: 'Accueil', href: '/' },
-    { name: 'Produits', href: '/products' },
-    { name: 'Catégories', href: '#categories' },
+    { name: 'Produits', href: '/breadProduct' }, 
+    { name: 'Catégories', href: '/breadProduct?openFilters=true' }, // ✅ open filters
     { name: 'À propos', href: '/apropos' },
     { name: 'Contact', href: '/contactus' },
   ];
 
+  // ✅ every category goes with openFilters=true
   const categories = [
-    { name: 'Cartes électroniques', href: '#' },
-    { name: 'Modules hydrauliques', href: '#' },
-    { name: 'Pompes', href: '#' },
-    { name: 'Vannes 3 voies', href: '#' },
-    { name: 'Capteurs', href: '#' },
+    { name: 'Cartes électroniques', slug: 'Carte-électronique' },
+    { name: 'Modules hydrauliques', slug: 'modules-hydraulyques' },
+    { name: 'Pompes', slug: 'pompe' },
+    { name: 'Vannes 3 voies', slug: 'vannes-3-voies' },
+    { name: 'Capteurs', slug: 'Capteur' },
+    
   ];
 
+  // ✅ every brand goes with openFilters=true
   const brands = [
-    { name: 'Saunier Duval', href: '#' },
-    { name: 'Beretta', href: '#' },
-    { name: 'Baxi', href: '#' },
-    { name: 'Facofri', href: '#' },
-    { name: 'Riello', href: '#' },
+    { name: 'Saunier Duval', tag: 'Saunier Duval' },
+    { name: 'Beretta', tag: 'Beretta' },
+    { name: 'Baxi', tag: 'Baxi' },
+    { name: 'Facofri', tag: 'Facofri' },
+    { name: 'Riello', tag: 'Riello' },
   ];
 
   const legal = [
@@ -36,27 +43,33 @@ const Footer = () => {
     { name: 'Facebook', icon: Facebook, href: 'https://www.facebook.com/facofrisav?mibextid=wwXIfr&rdid=UsnyEiSTMN3T7wn7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2FPZRqibTLvZvnEyqC%2F%3Fmibextid%3DwwXIfr#' },
     { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/prochaudiere/' },
     { name: 'tiktok', icon: FaTiktok, href: 'https://www.tiktok.com/@prochaudiere?_t=8sdG4jikYFh&_r=1' },
-    //{ name: 'YouTube', icon: Youtube, href: '#' },
     { name: 'Linkedin', icon: FaLinkedin, href: 'https://linkedin.com/in/mohamed-ait-ouarabi-054a05a2' },
-
   ];
 
+  // ✅ Navigate with openFilters=true
+  const handleCategoryClick = (categorySlug) => {
+    navigate(`/breadProduct?categories=${encodeURIComponent(categorySlug)}&openFilters=true`);
+  };
+
+  const handleBrandClick = (brandTag) => {
+    navigate(`/breadProduct?tags=${encodeURIComponent(brandTag)}&openFilters=true`);
+  };
+
   return (
-    <footer className="bg-foreground text-background">  {/*container before mx-auto */}
+    <footer className="bg-foreground text-background">
       <div className="px-6 md:px-12 lg:px-20 xl:px-24 2xl:px-32 mx-auto w-full">
         {/* Main footer content */}
         <div className="py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+            
             {/* Company info */}
             <div className="lg:col-span-2">
               <div className="flex items-center space-x-2 mb-6">
-
-                  <img
-    src="/Design-sans-titre-2.png"
-    alt="Pro Chaudière Logo"
-    className="h-14 w-auto object-contain "
-  />
-
+                <img
+                  src="/Design-sans-titre-2.png"
+                  alt="Pro Chaudière Logo"
+                  className="h-14 w-auto object-contain"
+                />
               </div>
               
               <p className="text-background/70 leading-relaxed mb-6 max-w-md">
@@ -75,7 +88,9 @@ const Footer = () => {
                 </div>
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 text-brand mr-3" />
-                  <span className="text-background/90">92 Salem Madani, N°11 bis 01, RDC, Douera, Alger, Algeria</span>
+                  <span className="text-background/90">
+                    92 Salem Madani, N°11 bis 01, RDC, Douera, Alger, Algeria
+                  </span>
                 </div>
               </div>
             </div>
@@ -86,12 +101,12 @@ const Footer = () => {
               <ul className="space-y-3">
                 {quickLinks.map((link) => (
                   <li key={link.name}>
-                    <a
-                      href={link.href}
+                    <Link
+                      to={link.href}
                       className="text-background/70 hover:text-brand transition-colors"
                     >
                       {link.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -103,12 +118,12 @@ const Footer = () => {
               <ul className="space-y-3">
                 {categories.map((category) => (
                   <li key={category.name}>
-                    <a
-                      href={category.href}
-                      className="text-background/70 hover:text-brand transition-colors"
+                    <button
+                      onClick={() => handleCategoryClick(category.slug)}
+                      className="text-background/70 hover:text-brand transition-colors text-left cursor-pointer"
                     >
                       {category.name}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -120,12 +135,12 @@ const Footer = () => {
               <ul className="space-y-3">
                 {brands.map((brand) => (
                   <li key={brand.name}>
-                    <a
-                      href={brand.href}
-                      className="text-background/70 hover:text-brand transition-colors"
+                    <button
+                      onClick={() => handleBrandClick(brand.tag)}
+                      className="text-background/70 hover:text-brand transition-colors text-left cursor-pointer"
                     >
                       {brand.name}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -136,6 +151,7 @@ const Footer = () => {
         {/* Bottom section */}
         <div className="border-t border-background/20 py-8">
           <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
+            
             {/* Legal links */}
             <div className="flex flex-wrap justify-center lg:justify-start gap-6">
               {legal.map((link) => (
@@ -152,22 +168,21 @@ const Footer = () => {
             {/* Social links */}
             <div className="flex items-center space-x-4">
               <span className="text-sm text-background/60 mr-2">Suivez-nous :</span>
-{socialLinks.map((social) => {
-  const IconComponent = social.icon;
-  return (
-    <a
-      key={social.name}
-      href={social.href}
-      target="_blank" // Opens in new tab
-      rel="noopener noreferrer" // Security best practice
-      className="h-10 w-10 bg-background/10 rounded-full flex items-center justify-center hover:bg-brand transition-colors group"
-      aria-label={social.name}
-    >
-      <IconComponent className="h-5 w-5 text-background/70 group-hover:text-white" />
-    </a>
-  );
-})}
-
+              {socialLinks.map((social) => {
+                const IconComponent = social.icon;
+                return (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="h-10 w-10 bg-background/10 rounded-full flex items-center justify-center hover:bg-brand transition-colors group"
+                    aria-label={social.name}
+                  >
+                    <IconComponent className="h-5 w-5 text-background/70 group-hover:text-white" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
