@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search, MapPin, Truck } from 'lucide-react';
-import ShippingModal from './Shippingmodal';
+import ShippingModal from './ShippingModal';
 import { apiClient } from '../../api/api';
 
 interface Wilaya {
@@ -275,5 +275,6 @@ const ShippingSettingsPage: React.FC = () => {
     </div>
   );
 };
+
 
 export default ShippingSettingsPage;
