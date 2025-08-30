@@ -117,43 +117,6 @@ const ShippingSettingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Wilayas</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">{totalWilayas}</p>
-            </div>
-            <MapPin className="w-8 h-8 text-sky-500" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Min Price</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">{minPrice} DA</p>
-            </div>
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-blue-600 font-bold text-sm">↓</span>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Max Price</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">{maxPrice} DA</p>
-            </div>
-            <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-              <span className="text-red-600 font-bold text-sm">↑</span>
-            </div>
-          </div>
-        </div>
-      </div>
-       */}
-
       {/* Error Display */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -170,79 +133,136 @@ const ShippingSettingsPage: React.FC = () => {
         {loading ? (
           <div className="p-12 text-center text-gray-500">Loading...</div>
         ) : filteredWilayas.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Wilaya
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Shipping Price
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredWilayas
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .map((wilaya) => (
-                    <tr key={wilaya.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center mr-3">
-                            <MapPin className="w-5 h-5 text-sky-600" />
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {wilaya.name}
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Wilaya
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Shipping Price
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredWilayas
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((wilaya) => (
+                      <tr key={wilaya.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center mr-3">
+                              <MapPin className="w-5 h-5 text-sky-600" />
                             </div>
-                            <div className="text-sm text-gray-500">
-                              ID: {wilaya.id}
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {wilaya.name}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                ID: {wilaya.id}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <span className="text-lg font-semibold text-gray-900">
-                            {wilaya.price} DA
-                          </span>
-                          {wilaya.price === minPrice && wilayas.length > 1 && (
-                            <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-                              Lowest
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <span className="text-lg font-semibold text-gray-900">
+                              {wilaya.price} DA
                             </span>
-                          )}
-                          {wilaya.price === maxPrice && wilayas.length > 1 && (
-                            <span className="ml-2 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
-                              Highest
+                            {wilaya.price === minPrice && wilayas.length > 1 && (
+                              <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                                Lowest
+                              </span>
+                            )}
+                            {wilaya.price === maxPrice && wilayas.length > 1 && (
+                              <span className="ml-2 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                                Highest
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex items-center justify-end space-x-2">
+                            <button
+                              onClick={() => handleEditWilaya(wilaya)}
+                              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteWilaya(wilaya.id)}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden divide-y divide-gray-200">
+              {filteredWilayas
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((wilaya) => (
+                  <div key={wilaya.id} className="p-4 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center flex-1 min-w-0">
+                        <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                          <MapPin className="w-5 h-5 text-sky-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 truncate">
+                            {wilaya.name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            ID: {wilaya.id}
+                          </div>
+                          <div className="flex items-center mt-1">
+                            <span className="text-lg font-semibold text-gray-900">
+                              {wilaya.price} DA
                             </span>
-                          )}
+                            {wilaya.price === minPrice && wilayas.length > 1 && (
+                              <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                                Lowest
+                              </span>
+                            )}
+                            {wilaya.price === maxPrice && wilayas.length > 1 && (
+                              <span className="ml-2 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                                Highest
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button
-                            onClick={() => handleEditWilaya(wilaya)}
-                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteWilaya(wilaya.id)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                      <div className="flex items-center space-x-2 ml-2 flex-shrink-0">
+                        <button
+                          onClick={() => handleEditWilaya(wilaya)}
+                          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteWilaya(wilaya.id)}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </>
         ) : (
           <div className="p-12 text-center text-gray-500">
             {searchTerm 
